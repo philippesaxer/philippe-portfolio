@@ -47,7 +47,7 @@ export function initScene({skills,projects,onSkillSelect,onPageChange,elements,o
     const contactMap=surface(256,256,(c,w,h)=>{const gradient=c.createRadialGradient(w/2,h/2,0,w/2,h/2,w/2);gradient.addColorStop(0,'rgba(20,13,9,.38)');gradient.addColorStop(.45,'rgba(20,13,9,.2)');gradient.addColorStop(1,'rgba(20,13,9,0)');c.fillStyle=gradient;c.fillRect(0,0,w,h);}).texture;
     const contactMaterial=new THREE.MeshBasicMaterial({map:contactMap,transparent:true,depthWrite:false,toneMapped:false});
     function contactShadow(x,z,w,d,y=.221){const shadow=new THREE.Mesh(new THREE.PlaneGeometry(w,d),contactMaterial);shadow.rotation.x=-Math.PI/2;shadow.position.set(x,y,z);shadow.renderOrder=1;room.add(shadow);}
-    contactShadow(-.4,-1.14,1.6,.95,.179);contactShadow(-2.75,-1.5,.9,.9,.179);contactShadow(.95,-1.3,1.35,.95,.179);
+    contactShadow(-.4,-1.305,1.6,1.3,.179);contactShadow(-2.75,-1.5,.9,.9,.179);contactShadow(.95,-1.3,1.35,.95,.179);
     contactShadow(-.47,.48,2.85,1.25);contactShadow(1.1,.4,.9,1.1);contactShadow(2.15,.98,1.9,1.7);contactShadow(-2.18,.95,1,1.45);contactShadow(-2.4,-.15,.75,.7,.179);contactShadow(2.75,-1.45,.9,.9,.179);
     // The introduction is drawn into the monitor's own screen texture.
     const monitorSurface=surface(2048,1152,(c,w,h)=>{
@@ -69,7 +69,12 @@ export function initScene({skills,projects,onSkillSelect,onPageChange,elements,o
       c.fillStyle='#416a4a';c.fillRect(1470,790,385,78);text(c,'INHALTE LESEN  ↗',1493,840,28,'#f1f8ee','700');
       text(c,'SCROLLEN, UM DEN ARBEITSPLATZ ZU ERKUNDEN',130,1040,27,'#abc8b0','700');
     });
-    const monitor=new THREE.Group();monitor.name='monitor';room.add(monitor);rounded(monitor,1.15,.08,.65,.04,ink,-.4,.25,-1.14);rounded(monitor,.13,.72,.14,.03,metal,-.4,.6,-1.65);rounded(monitor,2.8,1.66,.15,.07,ink,-.4,1.48,-1.52);const screen=new THREE.Mesh(new THREE.PlaneGeometry(2.63,1.48),new THREE.MeshBasicMaterial({map:monitorSurface.texture}));screen.position.set(-.4,1.49,-1.435);monitor.add(screen);const glass=new THREE.Mesh(new THREE.PlaneGeometry(2.63,1.48),new THREE.MeshPhysicalMaterial({color:0xd6eee0,transparent:true,opacity:.035,roughness:.18,metalness:.12,depthWrite:false}));glass.position.set(-.4,1.49,-1.431);monitor.add(glass);rounded(monitor,.42,.035,.04,.015,ink,-.4,2.32,-1.46);cylinder(monitor,.025,.025,.012,mat(0xa4eab7,{emissive:0x72d994,emissiveIntensity:.6}),.83,.73,-1.43);
+    const monitor=new THREE.Group();monitor.name='monitor';room.add(monitor);
+    // The base reaches the rear support and rests directly on the desktop.
+    rounded(monitor,1.15,.1125,.98,.04,ink,-.4,.23375,-1.305);
+    rounded(monitor,.23,.035,.23,.015,dark,-.4,.3,-1.65);
+    rounded(monitor,.13,.72,.14,.03,metal,-.4,.6,-1.65);
+    rounded(monitor,2.8,1.66,.15,.07,ink,-.4,1.48,-1.52);const screen=new THREE.Mesh(new THREE.PlaneGeometry(2.63,1.48),new THREE.MeshBasicMaterial({map:monitorSurface.texture}));screen.position.set(-.4,1.49,-1.435);monitor.add(screen);const glass=new THREE.Mesh(new THREE.PlaneGeometry(2.63,1.48),new THREE.MeshPhysicalMaterial({color:0xd6eee0,transparent:true,opacity:.035,roughness:.18,metalness:.12,depthWrite:false}));glass.position.set(-.4,1.49,-1.431);monitor.add(glass);rounded(monitor,.42,.035,.04,.015,ink,-.4,2.32,-1.46);cylinder(monitor,.025,.025,.012,mat(0xa4eab7,{emissive:0x72d994,emissiveIntensity:.6}),.83,.73,-1.43);
     // Printed keycaps and the small hardware display form the skills interface.
     const keyboard=new THREE.Group();keyboard.name='keyboard';room.add(keyboard);rounded(keyboard,2.45,.14,.91,.07,ink,-.47,.29,.48);
     const labels=skills.map(skill=>surface(256,256,c=>{c.clearRect(0,0,256,256);c.textAlign='center';text(c,skill[0],128,157,74,'#20382b','700');}));
