@@ -6,7 +6,7 @@ import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 gsap.registerPlugin(ScrollTrigger);
 
-export function initScene({skills,projects,onSkillSelect,onPageChange,elements,focusPhoneField,onOpenTextView}) {
+export function initScene({skills,projects,onSkillSelect,onPageChange,elements,onOpenTextView,onOpenContact}) {
   const canvas=document.querySelector('#scene');
   const reduced=matchMedia('(prefers-reduced-motion: reduce)'),coarse=matchMedia('(pointer: coarse)');
   let selected=0,page=0,highlight=-1,phonePage='home',phoneFocus='',phoneStatus='',renderDirty=true;
@@ -15,8 +15,8 @@ export function initScene({skills,projects,onSkillSelect,onPageChange,elements,f
   const optionalIntegrations=[];if(consent==='accepted')optionalIntegrations.forEach(start=>start());
   try {
     const renderer=new THREE.WebGLRenderer({canvas,antialias:true,alpha:true,powerPreference:'high-performance'});
-    const pixelRatio=()=>Math.min(devicePixelRatio,coarse.matches?1.5:2);
-    renderer.setPixelRatio(pixelRatio());renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.1;
+    const pixelRatio=()=>Math.min(devicePixelRatio,2,coarse.matches?Math.sqrt(3500000/(innerWidth*innerHeight)):2);
+    renderer.setPixelRatio(pixelRatio());renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;renderer.shadowMap.autoUpdate=false;renderer.shadowMap.needsUpdate=true;renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.1;
     const scene=new THREE.Scene(),camera=new THREE.PerspectiveCamera(38,1,.1,100);
     const environment=new RoomEnvironment();
     // Tint the studio reflection sources as well as the direct lights so metal
@@ -82,7 +82,8 @@ export function initScene({skills,projects,onSkillSelect,onPageChange,elements,f
       text(c,'PROJEKTE:',390,230,42,'#b8e1bf','700');lines(c,names.join('  /  '),390,305,960,60,'#f1f8ee',1.1);
     });
     rounded(room,2.15,.065,.61,.035,ink,-.47,.24,-.29);const skillScreen=new THREE.Mesh(new THREE.PlaneGeometry(2.02,.53),new THREE.MeshBasicMaterial({map:skillDisplay.texture}));skillScreen.rotation.x=-Math.PI/2;skillScreen.position.set(-.47,.277,-.29);room.add(skillScreen);
-    function selectSkill(index){selected=index;keys.forEach(key=>{key.material.emissiveIntensity=key.userData.skill===index?.8:0;});skillDisplay.refresh();onSkillSelect(index);}
+    let skillDisplayInitialized=false;
+    function selectSkill(index){if(selected===index&&skillDisplayInitialized)return;selected=index;skillDisplayInitialized=true;keys.forEach(key=>{key.material.emissiveIntensity=key.userData.skill===index?.8:0;});skillDisplay.refresh();onSkillSelect(index);}
     // A real mouse and a small circuit board.
     const mouse=new THREE.Group();mouse.name='mouse';room.add(mouse);
     const mouseShell=new THREE.Mesh(new THREE.SphereGeometry(.3,48,32),mat(0x293b33,{roughness:.32,metalness:.12}));mouseShell.scale.set(.82,.42,1.28);mouseShell.position.set(1.10,.35,.40);mouseShell.castShadow=true;mouse.add(mouseShell);
@@ -189,28 +190,21 @@ export function initScene({skills,projects,onSkillSelect,onPageChange,elements,f
     for(const x of [-3.05,3.05])for(const z of [-1.75,1.75])rounded(room,.18,.05,.18,.015,metal,x,-1.62,z);
     // Camera positions look directly at each physical surface.
     const frames=[{p:[-.4,1.55,2.0],l:[-.4,1.49,-1.43]},{p:[-.47,3.05,.24],l:[-.47,.33,.18]},{p:[2.15,2.28,1.51],l:[2.15,.37,.98]},{p:[1.49,1.5,-.7],l:[1.49,1.49,-1.966]},{p:[2.17,1.5,-.7],l:[2.17,1.49,-1.966]},{p:[2.85,1.5,-.7],l:[2.85,1.49,-1.966]},{p:[-2.18,2.09,1.01],l:[-2.18,.34,.95]}];
-    const progress={value:0},look=new THREE.Vector3(),position=new THREE.Vector3();let active=0;
-    function updateCamera(){let n=THREE.MathUtils.clamp(progress.value,0,6);if(reduced.matches)n=Math.round(n);const index=Math.floor(n),next=Math.min(6,index+1);let t=n-index;t=t*t*(3-2*t);active=Math.round(n);look.set(...frames[index].l).lerp(new THREE.Vector3(...frames[next].l),t);position.set(...frames[index].p).lerp(new THREE.Vector3(...frames[next].p),t);if(camera.aspect<1){const base=Math.max(1,1.03/camera.aspect);const zoom=[1,1,.84,1,1,1,.44];const factor=Math.max(1,base*THREE.MathUtils.lerp(zoom[index],zoom[next],t));position.sub(look).multiplyScalar(factor).add(look);}camera.position.copy(position);camera.lookAt(look);renderDirty=true;}
-    function resize(){renderer.setSize(innerWidth,innerHeight,false);renderer.setPixelRatio(pixelRatio());camera.aspect=innerWidth/innerHeight;camera.fov=camera.aspect<1?48:38;camera.updateProjectionMatrix();monitorSurface.refresh();updateCamera();ScrollTrigger.refresh();}
+    const progress={value:0},look=new THREE.Vector3(),position=new THREE.Vector3(),nextLook=new THREE.Vector3(),nextPosition=new THREE.Vector3();let active=0;
+    function updateCamera(){let n=THREE.MathUtils.clamp(progress.value,0,6);if(reduced.matches)n=Math.round(n);const index=Math.floor(n),next=Math.min(6,index+1);let t=n-index;t=t*t*(3-2*t);active=Math.round(n);look.set(...frames[index].l).lerp(nextLook.set(...frames[next].l),t);position.set(...frames[index].p).lerp(nextPosition.set(...frames[next].p),t);if(camera.aspect<1){const base=Math.max(1,1.03/camera.aspect);const zoom=[1,1,.84,1,1,1,.44];const factor=Math.max(1,base*THREE.MathUtils.lerp(zoom[index],zoom[next],t));position.sub(look).multiplyScalar(factor).add(look);}camera.position.copy(position);camera.lookAt(look);renderDirty=true;}
+    function resize(){const ratio=pixelRatio();if(renderer.getPixelRatio()!==ratio)renderer.setPixelRatio(ratio);renderer.setSize(innerWidth,innerHeight,false);camera.aspect=innerWidth/innerHeight;camera.fov=camera.aspect<1?48:38;camera.updateProjectionMatrix();monitorSurface.refresh();updateCamera();ScrollTrigger.refresh();}
     resize();gsap.to(progress,{value:6,ease:'none',onUpdate:updateCamera,scrollTrigger:{trigger:'#journey',start:'top top',end:'bottom bottom',scrub:reduced.matches?true:.7,invalidateOnRefresh:true}});window.addEventListener('resize',resize);window.addEventListener('orientationchange',resize);
     const raycaster=new THREE.Raycaster(),pointer=new THREE.Vector2();
     function pick(event){pointer.set(event.clientX/innerWidth*2-1,-event.clientY/innerHeight*2+1);raycaster.setFromCamera(pointer,camera);const targets=active===0?[screen]:active===1?keys:active===2?[note]:active===6?[phoneScreen]:[];return raycaster.intersectObjects(targets)[0];}
     const isMonitorButton=hit=>{if(!hit)return false;const y=1-hit.uv.y;return innerWidth<innerHeight?y>(coarse.matches?.73:.83)&&y<.97&&hit.uv.x>.03&&hit.uv.x<.4:y>.68&&y<.76&&hit.uv.x>.71&&hit.uv.x<.91;};
     canvas.addEventListener('pointermove',event=>{if(event.pointerType!=='mouse')return;const hit=pick(event);canvas.style.cursor=hit&&(active===0?isMonitorButton(hit):active===2?1-hit.uv.y>.90:true)?'pointer':'default';if(hit&&active===1)selectSkill(hit.object.userData.skill);});
-    let pointerStart=null;canvas.addEventListener('pointerdown',event=>{
-      pointerStart={x:event.clientX,y:event.clientY};
-      // Suppress the synthetic mouse click that otherwise blurs a touch-focused input.
-      if(event.pointerType==='touch'&&active===6&&(phonePage==='form'||phonePage==='newsletter')){
-        const hit=pick(event),screenY=hit?(1-hit.uv.y)*1800:-1,fieldCount=phonePage==='form'?3:1;
-        if(screenY>=430&&screenY<430+fieldCount*260)event.preventDefault();
-      }
-    });canvas.addEventListener('pointerup',event=>{if(!pointerStart||Math.hypot(event.clientX-pointerStart.x,event.clientY-pointerStart.y)>12){pointerStart=null;return;}pointerStart=null;const hit=pick(event);if(!hit)return;if(active===1){selectSkill(hit.object.userData.skill);return;}const y=1-hit.uv.y;if(active===0){if(isMonitorButton(hit))onOpenTextView();return;}if(active===2){if(y>.90)setPage(page+(hit.uv.x<.5?-1:1));return;}if(active!==6)return;
-      if(phonePage==='home'){if(y>.25&&y<.36)window.location.href='mailto:philippesaxer8@gmail.com';else if(y>.38&&y<.49)setPhonePage('form');else if(y>.49&&y<.57)setPhonePage('newsletter');else if(y>.62&&y<.67)setPhonePage('impressum');else if(y>.67&&y<.72)setPhonePage('datenschutz');else if(y>.72&&y<.77)setPhonePage('nutzung');else if(y>.77&&y<.83)setPhonePage('privacy');}
+    let pointerStart=null;canvas.addEventListener('pointerdown',event=>{pointerStart={x:event.clientX,y:event.clientY};});
+    canvas.addEventListener('pointerup',event=>{if(!pointerStart||Math.hypot(event.clientX-pointerStart.x,event.clientY-pointerStart.y)>12){pointerStart=null;return;}pointerStart=null;const hit=pick(event);if(!hit)return;if(active===1){selectSkill(hit.object.userData.skill);return;}const y=1-hit.uv.y;if(active===0){if(isMonitorButton(hit))onOpenTextView();return;}if(active===2){if(y>.90)setPage(page+(hit.uv.x<.5?-1:1));return;}if(active!==6)return;
+      if(phonePage==='home'){if(y>.25&&y<.36)window.location.href='mailto:philippesaxer8@gmail.com';else if(y>.38&&y<.57)onOpenContact(y>=.49);else if(y>.62&&y<.67)setPhonePage('impressum');else if(y>.67&&y<.72)setPhonePage('datenschutz');else if(y>.72&&y<.77)setPhonePage('nutzung');else if(y>.77&&y<.83)setPhonePage('privacy');}
       else if(y<.16)setPhonePage('home');else if(phonePage==='privacy'){if(y>.49&&y<.59)setConsent('accepted');else if(y>.59&&y<.69)setConsent('denied');}
-      else if(phonePage==='form'||phonePage==='newsletter'){const fields=phonePage==='form'?['name','email','message']:['newsletter'];const index=Math.floor((y*1800-430)/260);if(index>=0&&index<fields.length){phoneFocus=fields[index];focusPhoneField(phoneFocus);phoneSurface.refresh();}else if(y*1800>(phonePage==='form'?1250:760)&&y*1800<(phonePage==='form'?1390:900))document.querySelector(phonePage==='form'?'#contact-form':'#newsletter-form').requestSubmit();}
     });
-    let lastTime=0,frame=0;
-    function animate(time){frame=0;if(document.hidden||document.body.classList.contains('text-view'))return;frame=requestAnimationFrame(animate);if(coarse.matches&&time-lastTime<33)return;if(reduced.matches&&!renderDirty)return;if(!reduced.matches)lampLight.intensity=5.5+Math.sin(time*.001)*.08;lastTime=time;renderDirty=false;renderer.render(scene,camera);}
+    let frame=0;
+    function animate(time){frame=0;if(document.hidden||document.body.classList.contains('text-view'))return;frame=requestAnimationFrame(animate);if((coarse.matches||reduced.matches)&&!renderDirty)return;if(!reduced.matches&&!coarse.matches)lampLight.intensity=5.5+Math.sin(time*.001)*.08;renderDirty=false;renderer.render(scene,camera);}
     function syncRender(){if(document.hidden||document.body.classList.contains('text-view')){cancelAnimationFrame(frame);frame=0;}else if(!frame){renderDirty=true;frame=requestAnimationFrame(animate);}}
     document.addEventListener('visibilitychange',syncRender);window.addEventListener('scenevisibilitychange',syncRender);syncRender();selectSkill(0);onPageChange(0);
     return {available:true,selectSkill,setPage,turnPage:delta=>setPage(page+delta),showProject,setPhonePage,setPhoneStatus,setConsent,refreshPhone:()=>phoneSurface.refresh()};
