@@ -11,6 +11,10 @@ npm run dev
 
 `npm run build` erstellt die Produktionsfassung in `dist/`; `npm run preview` zeigt sie lokal an.
 
+## Auf GitHub Pages veröffentlichen
+
+In den Repository-Einstellungen unter **Pages → Build and deployment → Source** einmalig **GitHub Actions** auswählen. Danach baut `.github/workflows/deploy.yml` bei jedem Push auf `main` die Website und veröffentlicht den Inhalt von `dist/`. Die eigene Domain `philippesaxer.ch` bleibt in den Pages-Einstellungen und in `public/CNAME` hinterlegt. Die Quelldateien allein dürfen nicht direkt veröffentlicht werden, da der Browser die npm-Abhängigkeiten erst nach dem Vite-Build laden kann.
+
 ## Bedienung
 
 Scrollen bewegt die Kamera. Die Tasten auf der 3D-Tastatur zeigen die zugehörigen Projekte, die Pfeile im Notizbuch blättern durch vier Seiten, und das Telefon enthält Kontakt und Datenschutzeinstellungen.
