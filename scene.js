@@ -6,7 +6,7 @@ import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 gsap.registerPlugin(ScrollTrigger);
 
-export function initScene({skills,projects,onSkillSelect,onPageChange,elements,onOpenTextView}) {
+export function initScene({skills,projects,onSkillSelect,onPageChange,elements,focusPhoneField,onOpenTextView}) {
   const canvas=document.querySelector('#scene');
   const reduced=matchMedia('(prefers-reduced-motion: reduce)'),coarse=matchMedia('(pointer: coarse)');
   let selected=0,page=0,highlight=-1,phonePage='home',phoneFocus='',phoneStatus='',renderDirty=true;
@@ -142,7 +142,7 @@ export function initScene({skills,projects,onSkillSelect,onPageChange,elements,o
         text(c,'←  ZURÜCK',70,240,49,'#173d23','700');text(c,phonePage==='form'?'NACHRICHT':'NEUIGKEITEN',70,340,65,'#102a1b','700');
         const fields=phonePage==='form'?[['name','NAME'],['email','E-MAIL'],['message','NACHRICHT']]:[['newsletter','E-MAIL']];
         fields.forEach(([key,label],i)=>{const y=430+i*260;c.fillStyle=phoneFocus===key?'#abd5b3':'#c9e1cc';c.fillRect(70,y,880,205);text(c,label,105,y+60,48,'#173d23','700');const value=elements[key].value||'Antippen und schreiben';c.save();c.beginPath();c.rect(100,y+80,810,115);c.clip();lines(c,value,105,y+140,800,57,'#102a1b',1.15);c.restore();});
-        const buttonY=phonePage==='form'?1250:760;c.fillStyle='#163a23';c.fillRect(70,buttonY,880,140);text(c,'E-MAIL VORBEREITEN  ↗',105,buttonY+90,48,'#ffffff','700');
+        const buttonY=phonePage==='form'?1250:760;c.fillStyle='#163a23';c.fillRect(70,buttonY,880,140);if(phoneFocus==='submit'){c.strokeStyle='#82b88c';c.lineWidth=10;c.strokeRect(75,buttonY+5,870,130);}text(c,'E-MAIL VORBEREITEN  ↗',105,buttonY+90,48,'#ffffff','700');
         if(phoneStatus)lines(c,phoneStatus,70,buttonY+205,880,41,'#173d23');
       }else if(phonePage==='privacy'){
         text(c,'←  ZURÜCK',70,240,49,'#173d23','700');text(c,'PRIVATSPHÄRE',70,350,65,'#102a1b','700');
@@ -197,10 +197,17 @@ export function initScene({skills,projects,onSkillSelect,onPageChange,elements,o
     function pick(event){pointer.set(event.clientX/innerWidth*2-1,-event.clientY/innerHeight*2+1);raycaster.setFromCamera(pointer,camera);const targets=active===0?[screen]:active===1?keys:active===2?[note]:active===6?[phoneScreen]:[];return raycaster.intersectObjects(targets)[0];}
     const isMonitorButton=hit=>{if(!hit)return false;const y=1-hit.uv.y;return innerWidth<innerHeight?y>(coarse.matches?.73:.83)&&y<.97&&hit.uv.x>.03&&hit.uv.x<.4:y>.68&&y<.76&&hit.uv.x>.71&&hit.uv.x<.91;};
     canvas.addEventListener('pointermove',event=>{if(event.pointerType!=='mouse')return;const hit=pick(event);canvas.style.cursor=hit&&(active===0?isMonitorButton(hit):active===2?1-hit.uv.y>.90:true)?'pointer':'default';if(hit&&active===1)selectSkill(hit.object.userData.skill);});
-    let pointerStart=null;canvas.addEventListener('pointerdown',event=>{pointerStart={x:event.clientX,y:event.clientY};});canvas.addEventListener('pointerup',event=>{if(!pointerStart||Math.hypot(event.clientX-pointerStart.x,event.clientY-pointerStart.y)>12){pointerStart=null;return;}pointerStart=null;const hit=pick(event);if(!hit)return;if(active===1){selectSkill(hit.object.userData.skill);return;}const y=1-hit.uv.y;if(active===0){if(isMonitorButton(hit))onOpenTextView();return;}if(active===2){if(y>.90)setPage(page+(hit.uv.x<.5?-1:1));return;}if(active!==6)return;
+    let pointerStart=null;canvas.addEventListener('pointerdown',event=>{
+      pointerStart={x:event.clientX,y:event.clientY};
+      // Suppress the synthetic mouse click that otherwise blurs a touch-focused input.
+      if(event.pointerType==='touch'&&active===6&&(phonePage==='form'||phonePage==='newsletter')){
+        const hit=pick(event),screenY=hit?(1-hit.uv.y)*1800:-1,fieldCount=phonePage==='form'?3:1;
+        if(screenY>=430&&screenY<430+fieldCount*260)event.preventDefault();
+      }
+    });canvas.addEventListener('pointerup',event=>{if(!pointerStart||Math.hypot(event.clientX-pointerStart.x,event.clientY-pointerStart.y)>12){pointerStart=null;return;}pointerStart=null;const hit=pick(event);if(!hit)return;if(active===1){selectSkill(hit.object.userData.skill);return;}const y=1-hit.uv.y;if(active===0){if(isMonitorButton(hit))onOpenTextView();return;}if(active===2){if(y>.90)setPage(page+(hit.uv.x<.5?-1:1));return;}if(active!==6)return;
       if(phonePage==='home'){if(y>.25&&y<.36)window.location.href='mailto:philippesaxer8@gmail.com';else if(y>.38&&y<.49)setPhonePage('form');else if(y>.49&&y<.57)setPhonePage('newsletter');else if(y>.62&&y<.67)setPhonePage('impressum');else if(y>.67&&y<.72)setPhonePage('datenschutz');else if(y>.72&&y<.77)setPhonePage('nutzung');else if(y>.77&&y<.83)setPhonePage('privacy');}
       else if(y<.16)setPhonePage('home');else if(phonePage==='privacy'){if(y>.49&&y<.59)setConsent('accepted');else if(y>.59&&y<.69)setConsent('denied');}
-      else if(phonePage==='form'||phonePage==='newsletter'){const fields=phonePage==='form'?['name','email','message']:['newsletter'];const index=Math.floor((y*1800-430)/260);if(index>=0&&index<fields.length){phoneFocus=fields[index];elements[phoneFocus].focus({preventScroll:true});phoneSurface.refresh();}else if(y*1800>(phonePage==='form'?1250:760)&&y*1800<(phonePage==='form'?1390:900))document.querySelector(phonePage==='form'?'#contact-form':'#newsletter-form').requestSubmit();}
+      else if(phonePage==='form'||phonePage==='newsletter'){const fields=phonePage==='form'?['name','email','message']:['newsletter'];const index=Math.floor((y*1800-430)/260);if(index>=0&&index<fields.length){phoneFocus=fields[index];focusPhoneField(phoneFocus);phoneSurface.refresh();}else if(y*1800>(phonePage==='form'?1250:760)&&y*1800<(phonePage==='form'?1390:900))document.querySelector(phonePage==='form'?'#contact-form':'#newsletter-form').requestSubmit();}
     });
     let lastTime=0,frame=0;
     function animate(time){frame=0;if(document.hidden||document.body.classList.contains('text-view'))return;frame=requestAnimationFrame(animate);if(coarse.matches&&time-lastTime<33)return;if(reduced.matches&&!renderDirty)return;if(!reduced.matches)lampLight.intensity=5.5+Math.sin(time*.001)*.08;lastTime=time;renderDirty=false;renderer.render(scene,camera);}
