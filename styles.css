@@ -1,0 +1,27 @@
+:root{color-scheme:dark;background:#101816;color:#edf5ed;font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;line-height:1.6}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:1rem}
+body{margin:0;overflow-x:hidden}
+a{color:#d2efd6;text-underline-offset:.2em}
+a:hover{color:#fff}
+button,input,textarea{font:inherit}
+button,summary{cursor:pointer}
+button,summary,input,textarea{min-height:44px}
+button{border:1px solid #70977a;border-radius:.65rem;background:#244632;color:#f4fbf4;padding:.65rem 1rem}
+button:hover,summary:hover{background:#315c40}
+:focus-visible{outline:3px solid #d4f5b4;outline-offset:3px}
+#scene{display:none;position:fixed;inset:0;width:100%;height:100%;background:radial-gradient(ellipse at 50% 35%,#344a3f,#101815 75%);touch-action:pan-y}
+.immersive #scene:not([hidden]){display:block}
+.view-toggle{font-size:.9rem;font-weight:650}.view-toggle[hidden]{display:none}
+#journey{position:relative;max-width:72rem;margin:0 auto;padding:1rem 1rem 4rem}
+.story-stage{scroll-margin-top:1rem}.access-copy{padding:clamp(1.25rem,4vw,3rem);margin:0 0 1rem;background:rgba(21,39,28,.96);border:1px solid #385b42;border-radius:1rem;overflow-wrap:anywhere}
+.eyebrow{margin:0 0 .6rem;color:#b6dcb8;text-transform:uppercase;letter-spacing:.12em;font-size:.75rem;font-weight:700}
+h1,h2,h3{line-height:1.2;letter-spacing:-.025em}h1{font-size:clamp(2rem,6vw,4rem);max-width:20ch;margin:.3rem 0 1rem}h2{font-size:clamp(1.5rem,3vw,2.3rem);margin:1.7rem 0 .7rem}h3{font-size:1.15rem;margin:1.4rem 0 .5rem}.lead{font-size:clamp(1.1rem,2vw,1.35rem);max-width:65ch}p{max-width:75ch}
+.skill-controls,.page-controls,.legal-controls{display:flex;flex-wrap:wrap;gap:.6rem;margin:1rem 0}.project-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,16rem),1fr));gap:.8rem;margin-top:1.5rem}.project-grid article{padding:1rem 1.2rem;border:1px solid #47664e;border-radius:.7rem;background:#203b2a}.project-grid h3{margin:0 0 .5rem}.project-grid p{margin:0;color:#d4e6d5}
+form{display:grid;gap:.5rem;max-width:38rem;margin:1rem 0 2rem}form label{font-weight:650}input,textarea{width:100%;border:1px solid #78927d;border-radius:.5rem;background:#eef5ed;color:#13251a;padding:.7rem}textarea{resize:vertical}form button{justify-self:start;margin-top:.5rem}form [hidden]{display:none}.legal-controls details{width:100%;border:1px solid #47664e;border-radius:.6rem;padding:.5rem .8rem}.legal-controls summary{padding:.4rem 0;font-weight:650}
+.immersive:not(.text-view) #journey{max-width:none;padding:0;pointer-events:none}.immersive:not(.text-view) .story-stage{height:100vh;height:100dvh;pointer-events:none}.immersive:not(.text-view) .access-copy{position:absolute!important;width:1px!important;height:1px!important;padding:0!important;margin:-1px!important;overflow:hidden!important;clip:rect(0,0,0,0)!important;clip-path:inset(50%)!important;white-space:nowrap!important;border:0!important}
+.immersive:not(.text-view) .access-copy a,.immersive:not(.text-view) .access-copy button,.immersive:not(.text-view) .access-copy input,.immersive:not(.text-view) .access-copy textarea,.immersive:not(.text-view) .access-copy summary{pointer-events:auto}
+.text-view #scene{opacity:.18;pointer-events:none}.text-view #journey{z-index:1}
+.text-view .page-controls,body:not(.immersive) .page-controls{display:none}
+@media(max-width:480px){.access-copy{padding:1.2rem}.project-grid{grid-template-columns:1fr}#journey{padding-inline:.75rem}h1{font-size:2rem}}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
