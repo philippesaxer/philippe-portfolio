@@ -23,7 +23,7 @@ skills.forEach((skill,index)=>{const button=document.createElement('button');but
 document.querySelectorAll('[data-project]').forEach(link=>link.addEventListener('focus',()=>world?.showProject(Number(link.dataset.project))));
 const selectSkill=index=>{document.querySelector('#skill-status').textContent=`${skills[index][1]}: ${projects.filter(project=>project[1]===skills[index][2]).map(project=>project[0]).join(', ')}`;};
 const selectPage=page=>{document.querySelector('#page-status').textContent=`Notizbuchseite ${page+1} von 4`;};
-world=initScene({skills,projects,onSkillSelect:selectSkill,onPageChange:selectPage,elements,onOpenTextView:()=>setTextView(true,document.querySelector('#start')),onOpenContact:isNewsletter=>{setTextView(true,document.querySelector('#kontakt'));if(isNewsletter)document.querySelector('#newsletter-form').scrollIntoView({behavior:'instant',block:'start'});}});
+world=initScene({skills,projects,onSkillSelect:selectSkill,onPageChange:selectPage,elements,onOpenTextView:()=>setTextView(true,document.querySelector('#start')),onOpenContact:openPhoneForm});
 const viewToggle=document.querySelector('#view-toggle');
 function setTextView(enabled,stage){
   if(!world.available)return;
@@ -33,10 +33,21 @@ function setTextView(enabled,stage){
 }
 if(world.available){document.body.classList.add('immersive');viewToggle.hidden=false;window.dispatchEvent(new Event('resize'));}
 viewToggle.addEventListener('click',()=>setTextView(!document.body.classList.contains('text-view')));
-document.querySelectorAll('[data-open-section]').forEach(button=>button.addEventListener('click',()=>setTextView(true,document.getElementById(button.dataset.openSection))));
+const phoneDialog=document.querySelector('#phone-form-dialog'),phoneFormContent=document.querySelector('#phone-form-content');
+let phoneForm,phoneFormPlaceholder;
+function openPhoneForm(isNewsletter){
+  if(phoneFormPlaceholder)return;
+  phoneForm=document.querySelector(isNewsletter?'#newsletter-form':'#contact-form');
+  phoneFormPlaceholder=document.createComment('phone form');phoneForm.before(phoneFormPlaceholder);
+  phoneFormContent.append(phoneForm);
+  document.querySelector('#phone-form-title').textContent=isNewsletter?'Neuigkeiten':'Nachricht schreiben';
+  world.setPhonePage(isNewsletter?'newsletter':'form');phoneDialog.showModal();
+}
+document.querySelector('#phone-form-close').addEventListener('click',()=>phoneDialog.close());
+phoneDialog.addEventListener('close',()=>{if(phoneFormPlaceholder){phoneFormPlaceholder.replaceWith(phoneForm);phoneFormPlaceholder=null;phoneForm=null;}world.setPhonePage('home');});
 document.querySelector('#previous-page').addEventListener('click',()=>world.turnPage(-1));document.querySelector('#next-page').addEventListener('click',()=>world.turnPage(1));
 document.querySelectorAll('[data-consent]').forEach(button=>button.addEventListener('click',()=>{world.setConsent(button.dataset.consent);document.querySelector('#consent-status').textContent=button.dataset.consent==='accepted'?'Optionale Technologien sind erlaubt.':'Nur notwendige Technologien sind erlaubt.';}));
-for(const element of Object.values(elements))element.addEventListener('input',()=>element.removeAttribute('aria-invalid'));
+for(const element of Object.values(elements))element.addEventListener('input',()=>{element.removeAttribute('aria-invalid');world.refreshPhone();});
 // Reveal the real HTML controls whenever keyboard navigation reaches a hidden stage.
 document.addEventListener('focusin',event=>{
   const stage=event.target.closest('.story-stage');

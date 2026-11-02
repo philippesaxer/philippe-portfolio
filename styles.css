@@ -26,16 +26,12 @@ form{display:grid;gap:.5rem;max-width:38rem;margin:1rem 0 2rem}form label{font-w
 @media(max-width:480px){.access-copy{padding:1.2rem}.project-grid{grid-template-columns:1fr}#journey{padding-inline:.75rem}h1{font-size:2rem}}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
 
-/* Touch navigation stays outside the canvas so its controls have real hit targets. */
-.mobile-nav{display:none}
 input,textarea{font-size:16px;scroll-margin-block:1.5rem}
 input:focus,textarea:focus{outline:3px solid #b6e4a5;outline-offset:2px;border-color:#315c40}
 input[aria-invalid="true"],textarea[aria-invalid="true"]{border-color:#b44a3c;outline-color:#f3a99e}
 form [role="status"]:empty{display:none}
 @media(max-width:767px),(pointer:coarse){
   .immersive:not(.text-view) .story-stage{height:100vh;height:100svh}
-  .immersive:not(.text-view) .mobile-nav{display:flex;position:fixed;z-index:3;left:max(.75rem,env(safe-area-inset-left));right:max(.75rem,env(safe-area-inset-right));bottom:max(.75rem,env(safe-area-inset-bottom));gap:.4rem;padding:.4rem;border:1px solid #69856d;border-radius:1rem;background:rgba(16,32,23,.96);box-shadow:0 .5rem 1.5rem #0006}
-  .mobile-nav button{flex:1;min-width:0;padding:.6rem .35rem;font-size:.85rem;line-height:1.2}
   #journey{padding: max(1rem,env(safe-area-inset-top)) max(.75rem,env(safe-area-inset-right)) max(2rem,env(safe-area-inset-bottom)) max(.75rem,env(safe-area-inset-left))}
   .access-copy{padding:1.25rem;margin-bottom:.75rem}
   .project-grid{grid-template-columns:1fr}
@@ -48,3 +44,11 @@ form [role="status"]:empty{display:none}
   textarea{min-height:9rem}
   .legal-controls button{width:100%;margin:.25rem 0}
 }
+
+#phone-form-dialog{width:min(90vw,26rem);max-height:min(90vh,90dvh);padding:1.2rem;border:2px solid #70977a;border-radius:1.5rem;background:#e8f3e8;color:#102a1b;box-shadow:0 1rem 4rem #000a;overflow:auto}
+#phone-form-dialog::backdrop{background:rgba(5,15,9,.48)}
+#phone-form-dialog[open]{animation:phone-form-in .3s ease-out}
+.phone-form-header{display:flex;align-items:center;justify-content:space-between;gap:1rem}.phone-form-header h2{margin:0;font-size:1.4rem}.phone-form-header button{min-width:44px;padding:.35rem}
+#phone-form-dialog form{margin:1rem 0 0}#phone-form-dialog input,#phone-form-dialog textarea{background:#fff;color:#102a1b}#phone-form-dialog form button{justify-self:stretch}#phone-form-dialog textarea{min-height:7rem}
+@keyframes phone-form-in{from{opacity:0;transform:scale(.92) translateY(1rem)}to{opacity:1;transform:none}}
+@media(prefers-reduced-motion:reduce){#phone-form-dialog[open]{animation:none}}

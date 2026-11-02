@@ -15,7 +15,7 @@ export function initScene({skills,projects,onSkillSelect,onPageChange,elements,o
   const optionalIntegrations=[];if(consent==='accepted')optionalIntegrations.forEach(start=>start());
   try {
     const renderer=new THREE.WebGLRenderer({canvas,antialias:true,alpha:true,powerPreference:'high-performance'});
-    const pixelRatio=()=>Math.min(devicePixelRatio,2,coarse.matches?Math.sqrt(3500000/(innerWidth*innerHeight)):2);
+    const pixelRatio=()=>Math.min(devicePixelRatio,2,Math.sqrt(3500000/(innerWidth*innerHeight)));
     renderer.setPixelRatio(pixelRatio());renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;renderer.shadowMap.autoUpdate=false;renderer.shadowMap.needsUpdate=true;renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.1;
     const scene=new THREE.Scene(),camera=new THREE.PerspectiveCamera(38,1,.1,100);
     const environment=new RoomEnvironment();
@@ -24,7 +24,7 @@ export function initScene({skills,projects,onSkillSelect,onPageChange,elements,o
     environment.traverse(object=>{if(object.isLight)object.color.set(0xffe4c4);if(object.material?.emissiveIntensity>0)object.material.emissive.set(0xffe8d1);});
     const pmrem=new THREE.PMREMGenerator(renderer);scene.environment=pmrem.fromScene(environment,.08).texture;scene.environmentIntensity=.2;environment.dispose();pmrem.dispose();
     scene.add(new THREE.HemisphereLight(0xffdfbc,0x30251f,.85));
-    const sun=new THREE.DirectionalLight(0xffc995,2.35);sun.position.set(-4,8,5);sun.castShadow=true;const shadowSize=coarse.matches?1024:innerWidth>900?4096:2048;sun.shadow.mapSize.set(shadowSize,shadowSize);Object.assign(sun.shadow.camera,{left:-8,right:8,top:8,bottom:-8,near:.1,far:30});sun.shadow.bias=-.00025;sun.shadow.normalBias=.025;scene.add(sun);
+    const sun=new THREE.DirectionalLight(0xffc995,2.35);sun.position.set(-4,8,5);sun.castShadow=true;const shadowSize=coarse.matches?1024:2048;sun.shadow.mapSize.set(shadowSize,shadowSize);Object.assign(sun.shadow.camera,{left:-8,right:8,top:8,bottom:-8,near:.1,far:30});sun.shadow.bias=-.00025;sun.shadow.normalBias=.025;scene.add(sun);
     const rim=new THREE.DirectionalLight(0xffd4a6,.42);rim.position.set(5,4,-6);scene.add(rim);
     const lampLight=new THREE.PointLight(0xffbd75,5.5,4.5,2);lampLight.position.set(-2.35,2.05,-1.35);scene.add(lampLight);
     const mat=(color,options={})=>new THREE.MeshStandardMaterial({color,roughness:.75,...options});
@@ -193,7 +193,13 @@ export function initScene({skills,projects,onSkillSelect,onPageChange,elements,o
     const progress={value:0},look=new THREE.Vector3(),position=new THREE.Vector3(),nextLook=new THREE.Vector3(),nextPosition=new THREE.Vector3();let active=0;
     function updateCamera(){let n=THREE.MathUtils.clamp(progress.value,0,6);if(reduced.matches)n=Math.round(n);const index=Math.floor(n),next=Math.min(6,index+1);let t=n-index;t=t*t*(3-2*t);active=Math.round(n);look.set(...frames[index].l).lerp(nextLook.set(...frames[next].l),t);position.set(...frames[index].p).lerp(nextPosition.set(...frames[next].p),t);if(camera.aspect<1){const base=Math.max(1,1.03/camera.aspect);const zoom=[1,1,.84,1,1,1,.44];const factor=Math.max(1,base*THREE.MathUtils.lerp(zoom[index],zoom[next],t));position.sub(look).multiplyScalar(factor).add(look);}camera.position.copy(position);camera.lookAt(look);renderDirty=true;}
     function resize(){const ratio=pixelRatio();if(renderer.getPixelRatio()!==ratio)renderer.setPixelRatio(ratio);renderer.setSize(innerWidth,innerHeight,false);camera.aspect=innerWidth/innerHeight;camera.fov=camera.aspect<1?48:38;camera.updateProjectionMatrix();monitorSurface.refresh();updateCamera();ScrollTrigger.refresh();}
-    resize();gsap.to(progress,{value:6,ease:'none',onUpdate:updateCamera,scrollTrigger:{trigger:'#journey',start:'top top',end:'bottom bottom',scrub:reduced.matches?true:.7,invalidateOnRefresh:true}});window.addEventListener('resize',resize);window.addEventListener('orientationchange',resize);
+    resize();
+    // Animate toward the current scroll position on every device, including after large wheel steps.
+    ScrollTrigger.create({trigger:'#journey',start:'top top',end:'bottom bottom',onUpdate:self=>{
+      const target=self.progress*6;
+      if(reduced.matches){gsap.killTweensOf(progress);progress.value=target;updateCamera();}
+      else gsap.to(progress,{value:target,duration:.7,ease:'power2.out',overwrite:true,onUpdate:updateCamera});
+    }});window.addEventListener('resize',resize);window.addEventListener('orientationchange',resize);
     const raycaster=new THREE.Raycaster(),pointer=new THREE.Vector2();
     function pick(event){pointer.set(event.clientX/innerWidth*2-1,-event.clientY/innerHeight*2+1);raycaster.setFromCamera(pointer,camera);const targets=active===0?[screen]:active===1?keys:active===2?[note]:active===6?[phoneScreen]:[];return raycaster.intersectObjects(targets)[0];}
     const isMonitorButton=hit=>{if(!hit)return false;const y=1-hit.uv.y;return innerWidth<innerHeight?y>(coarse.matches?.73:.83)&&y<.97&&hit.uv.x>.03&&hit.uv.x<.4:y>.68&&y<.76&&hit.uv.x>.71&&hit.uv.x<.91;};
@@ -204,7 +210,7 @@ export function initScene({skills,projects,onSkillSelect,onPageChange,elements,o
       else if(y<.16)setPhonePage('home');else if(phonePage==='privacy'){if(y>.49&&y<.59)setConsent('accepted');else if(y>.59&&y<.69)setConsent('denied');}
     });
     let frame=0;
-    function animate(time){frame=0;if(document.hidden||document.body.classList.contains('text-view'))return;frame=requestAnimationFrame(animate);if((coarse.matches||reduced.matches)&&!renderDirty)return;if(!reduced.matches&&!coarse.matches)lampLight.intensity=5.5+Math.sin(time*.001)*.08;renderDirty=false;renderer.render(scene,camera);}
+    function animate(){frame=0;if(document.hidden||document.body.classList.contains('text-view'))return;frame=requestAnimationFrame(animate);if(!renderDirty)return;renderDirty=false;renderer.render(scene,camera);}
     function syncRender(){if(document.hidden||document.body.classList.contains('text-view')){cancelAnimationFrame(frame);frame=0;}else if(!frame){renderDirty=true;frame=requestAnimationFrame(animate);}}
     document.addEventListener('visibilitychange',syncRender);window.addEventListener('scenevisibilitychange',syncRender);syncRender();selectSkill(0);onPageChange(0);
     return {available:true,selectSkill,setPage,turnPage:delta=>setPage(page+delta),showProject,setPhonePage,setPhoneStatus,setConsent,refreshPhone:()=>phoneSurface.refresh()};
