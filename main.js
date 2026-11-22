@@ -1,5 +1,6 @@
 import { initScene } from './scene.js';
 
+// The scene keeps its original project and skill data independently of the 2D selection.
 const skills = [
   ['GMS','Spieleentwicklung','Spiele'], ['BE','Serverentwicklung / Node.js','Server'], ['IoT','Vernetzte Geräte','Vernetzung'], ['FE','Frontend / JavaScript','Frontend'],
   ['PR','Python und Grundlagen','Programmierung'], ['DB','Datenbanken / SQL und UML','Datenbanken'], ['TL','Werkzeuge / MS Office','Werkzeuge'], ['SY','Systeme / Git und sauberer Code','Systeme']
@@ -19,20 +20,44 @@ const projects = [
 const elements = {name:document.querySelector('#name'),email:document.querySelector('#email'),message:document.querySelector('#message'),newsletter:document.querySelector('#newsletter-email')};
 let world;
 const skillControls=document.querySelector('#skill-controls');
-skills.forEach((skill,index)=>{const button=document.createElement('button');button.type='button';button.textContent=`${skill[0]} – ${skill[1]}: ${projects.filter(project=>project[1]===skill[2]).map(project=>project[0]).join(', ')}`;button.addEventListener('focus',()=>world?.selectSkill(index));button.addEventListener('click',()=>world?.selectSkill(index));skillControls.append(button);});
-document.querySelectorAll('[data-project]').forEach(link=>link.addEventListener('focus',()=>world?.showProject(Number(link.dataset.project))));
+skills.forEach((skill,index)=>{
+  const button=document.createElement('button');
+  button.type='button';button.tabIndex=-1;
+  button.textContent=`${skill[0]} – ${skill[1]}: ${projects.filter(project=>project[1]===skill[2]).map(project=>project[0]).join(', ')}`;
+  button.addEventListener('focus',()=>world?.selectSkill(index));button.addEventListener('click',()=>world?.selectSkill(index));skillControls.append(button);
+});
 const selectSkill=index=>{document.querySelector('#skill-status').textContent=`${skills[index][1]}: ${projects.filter(project=>project[1]===skills[index][2]).map(project=>project[0]).join(', ')}`;};
 const selectPage=page=>{document.querySelector('#page-status').textContent=`Notizbuchseite ${page+1} von 4`;};
-world=initScene({skills,projects,onSkillSelect:selectSkill,onPageChange:selectPage,elements,onOpenTextView:()=>setTextView(true,document.querySelector('#start')),onOpenContact:openPhoneForm});
+world=initScene({skills,projects,onSkillSelect:selectSkill,onPageChange:selectPage,elements,onOpenTextView:()=>setTextView(true,document.querySelector('#start'),true),onOpenContact:openPhoneForm});
 const viewToggle=document.querySelector('#view-toggle');
-function setTextView(enabled,stage){
-  if(!world.available)return;
-  const current=stage||Array.from(document.querySelectorAll('.story-stage')).reduce((closest,item)=>Math.abs(item.getBoundingClientRect().top)<Math.abs(closest.getBoundingClientRect().top)?item:closest);
-  document.body.classList.toggle('text-view',enabled);window.dispatchEvent(new Event('scenevisibilitychange'));viewToggle.textContent=enabled?'3D-Ansicht':'Inhalte lesen';viewToggle.setAttribute('aria-pressed',String(enabled));
-  window.dispatchEvent(new Event('resize'));current.scrollIntoView({behavior:'instant',block:'start'});
+let closingView=false;
+function setTextView(enabled,stage,moveFocus=false){
+  if(!world.available||closingView)return;
+  if(enabled){
+    document.body.classList.add('text-view');
+    document.querySelector('#start .access-copy').getBoundingClientRect();
+    window.dispatchEvent(new Event('scenevisibilitychange'));
+    window.dispatchEvent(new Event('resize'));
+    (stage||document.querySelector('#start')).scrollIntoView({behavior:'instant',block:'start'});
+    if(moveFocus)document.querySelector('h1').focus({preventScroll:true});
+    return;
+  }
+  const stages=Array.from(document.querySelectorAll('.story-stage')).filter(item=>item.getClientRects().length);
+  const current=stage||stages.reduce((closest,item)=>Math.abs(item.getBoundingClientRect().top)<Math.abs(closest.getBoundingClientRect().top)?item:closest);
+  closingView=true;
+  document.body.classList.add('leaving-text');
+  const delay=matchMedia('(prefers-reduced-motion: reduce)').matches?0:220;
+  setTimeout(()=>{
+    document.body.classList.remove('text-view','leaving-text');
+    window.dispatchEvent(new Event('scenevisibilitychange'));
+    window.dispatchEvent(new Event('resize'));
+    window.scrollTo({top:current.offsetTop,left:0,behavior:'instant'});
+    document.body.focus({preventScroll:true});
+    closingView=false;
+  },delay);
 }
 if(world.available){document.body.classList.add('immersive');viewToggle.hidden=false;window.dispatchEvent(new Event('resize'));}
-viewToggle.addEventListener('click',()=>setTextView(!document.body.classList.contains('text-view')));
+viewToggle.addEventListener('click',()=>setTextView(false));
 const phoneDialog=document.querySelector('#phone-form-dialog'),phoneFormContent=document.querySelector('#phone-form-content');
 let phoneForm,phoneFormPlaceholder;
 function openPhoneForm(isNewsletter){
@@ -46,12 +71,16 @@ function openPhoneForm(isNewsletter){
 document.querySelector('#phone-form-close').addEventListener('click',()=>phoneDialog.close());
 phoneDialog.addEventListener('close',()=>{if(phoneFormPlaceholder){phoneFormPlaceholder.replaceWith(phoneForm);phoneFormPlaceholder=null;phoneForm=null;}world.setPhonePage('home');});
 document.querySelector('#previous-page').addEventListener('click',()=>world.turnPage(-1));document.querySelector('#next-page').addEventListener('click',()=>world.turnPage(1));
-document.querySelectorAll('[data-consent]').forEach(button=>button.addEventListener('click',()=>{world.setConsent(button.dataset.consent);document.querySelector('#consent-status').textContent=button.dataset.consent==='accepted'?'Optionale Technologien sind erlaubt.':'Nur notwendige Technologien sind erlaubt.';}));
 for(const element of Object.values(elements))element.addEventListener('input',()=>{element.removeAttribute('aria-invalid');world.refreshPhone();});
-// Reveal the real HTML controls whenever keyboard navigation reaches a hidden stage.
+// Keyboard access to the scene's underlying content opens the readable view.
 document.addEventListener('focusin',event=>{
   const stage=event.target.closest('.story-stage');
   if(stage&&document.body.classList.contains('immersive')&&!document.body.classList.contains('text-view')){setTextView(true,stage);event.target.scrollIntoView({behavior:'instant',block:'nearest'});}
+});
+document.querySelector('.copy-email').addEventListener('click',async()=>{
+  const status=document.querySelector('#copy-status');
+  try { await navigator.clipboard.writeText('philippesaxer8@gmail.com');status.textContent='E-Mail-Adresse kopiert.'; }
+  catch { status.textContent='Kopieren nicht möglich. Die Adresse steht direkt darüber.'; }
 });
 const clean=value=>value.replace(/[\u0000-\u001f\u007f<>]/g,' ').replace(/\s+/g,' ').trim();
 const cleanMessage=value=>value.replace(/\r\n?/g,'\n').replace(/[\u0000-\u0009\u000b-\u001f\u007f<>]/g,' ').trim();
@@ -62,13 +91,14 @@ function prepareMail(form,isNewsletter){
   if(data.get('website'))return;
   const invalid=!isNewsletter&&!name?form.elements.name:!validEmail(email)?form.elements.email:!isNewsletter&&!message?form.elements.message:null;
   if(invalid){
-    status.textContent='Bitte f\u00fclle alle Felder aus und gib eine g\u00fcltige E-Mail-Adresse ein.';
+    status.textContent='Bitte fülle alle Felder aus und gib eine gültige E-Mail-Adresse ein.';
     invalid.setAttribute('aria-invalid','true');world.setPhoneStatus(status.textContent);invalid.focus();return;
   }
   form.elements.csrf_token.value=document.querySelector('meta[name="csrf-token"]')?.content||'';
   const subject=isNewsletter?'Anfrage zu Neuigkeiten':`Nachricht von ${name}`;
-  const body=isNewsletter?`Hallo Philippe,\n\nich interessiere mich f\u00fcr Neuigkeiten.\n\nMeine E-Mail: ${email}`:`Hallo Philippe,\n\n${message}\n\n${name}\n${email}`;
-  status.textContent='Dein E-Mail-Programm wird ge\u00f6ffnet. Bitte sende die Nachricht dort ab.';world.setPhoneStatus(status.textContent);
+  const body=isNewsletter?`Hallo Philippe,\n\nich interessiere mich für Neuigkeiten.\n\nMeine E-Mail: ${email}`:`Hallo Philippe,\n\n${message}\n\n${name}\n${email}`;
+  status.textContent='Dein E-Mail-Programm wird geöffnet. Bitte sende die Nachricht dort ab.';world.setPhoneStatus(status.textContent);
   window.location.href=`mailto:philippesaxer8@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
 }
-document.querySelector('#contact-form').addEventListener('submit',e=>{e.preventDefault();prepareMail(e.currentTarget,false);});document.querySelector('#newsletter-form').addEventListener('submit',e=>{e.preventDefault();prepareMail(e.currentTarget,true);});
+document.querySelector('#contact-form').addEventListener('submit',e=>{e.preventDefault();prepareMail(e.currentTarget,false);});
+document.querySelector('#newsletter-form').addEventListener('submit',e=>{e.preventDefault();prepareMail(e.currentTarget,true);});

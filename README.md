@@ -21,7 +21,7 @@ Scrollen bewegt die Kamera. Die Tasten auf der 3D-Tastatur zeigen die zugehörig
 
 ## Suche und Pflege
 
-Die Website enthält eine indexierbare Startseite. `public/robots.txt` und `public/sitemap.xml` werden beim Build unverändert veröffentlicht. Die Projektlinks führen zu bestehenden Seiten auf philippesaxer.ch; sie gehören nicht zu diesem Repository und sind deshalb nicht in dessen Sitemap enthalten. Die Inhalte, Projektangaben, JSON-LD und die 3D-Texte sollten bei Änderungen gemeinsam aktualisiert werden. Die EFZ-Ausbildung ist als angestrebter Abschluss beschrieben, nicht als erworbene Qualifikation.
+Die Website enthält eine indexierbare Startseite. `public/robots.txt` und `public/sitemap.xml` werden beim Build unverändert veröffentlicht. Die statische Ansicht verlinkt ausgewählte öffentliche GitHub-Repositories und, soweit vorhanden, eine Live-Ansicht. Die Inhalte, Projektangaben, JSON-LD und die 3D-Texte sollten bei Änderungen gemeinsam aktualisiert werden. Die EFZ-Ausbildung ist als angestrebter Abschluss beschrieben, nicht als erworbene Qualifikation.
 
 Nach der Veröffentlichung Canonical-URL, Weiterleitungen, Sitemap und Projektlinks auf dem Zielserver prüfen und die Sitemap in der jeweiligen Suchmaschinen-Konsole einreichen. Rankings, Indexierung und Darstellung in KI-Antworten können nicht garantiert werden. Web-Vitals-Werte müssen mit echten Nutzungsdaten und auf realen Geräten gemessen werden.
 
@@ -30,4 +30,8 @@ Nach der Veröffentlichung Canonical-URL, Weiterleitungen, Sitemap und Projektli
 - Impressum, Datenschutzhinweise und Nutzungsbedingungen mit den vollständigen, rechtlich passenden Angaben ergänzen und prüfen lassen.
 - Kontakt und Newsletter bereiten eine Nachricht im E-Mail-Programm vor; es gibt keinen Versandserver und keine automatische Newsletter-Anmeldung. Ein späteres Backend muss serverseitig validieren und einen echten CSRF-Schutz bereitstellen.
 - Optionale Integrationen ausschliesslich über den Consent-Manager in `scene.js` registrieren und ihre Datenverarbeitung in der Datenschutzerklärung beschreiben.
-- Die Projektlinks und die E-Mail-Adresse verweisen auf die zum Erstellungszeitpunkt öffentlich zugängliche Website von Philippe Saxer.
+- Die Projektlinks und die E-Mail-Adresse vor einer Veröffentlichung erneut prüfen.
+
+## Projektbilder
+
+Die Projektkarten funktionieren ohne Bilder. Sobald eigene Bilder vorliegen, kann direkt vor dem jeweiligen Element `project-content` ein `figure` mit der Klasse `project-media` und einem Bild eingefügt werden. Die Gestaltung verwendet ein Verhältnis von 16:10 und `object-fit: cover`; passende Alternativtexte und `loading="lazy"` ergänzen. Dateien können lokal unter `public/` abgelegt werden.
