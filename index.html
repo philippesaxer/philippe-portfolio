@@ -20,6 +20,7 @@
   {"@context":"https://schema.org","@type":"Person","name":"Philippe Saxer","url":"https://philippesaxer.ch/","jobTitle":"Lernender Informatiker EFZ, Fachrichtung Applikationsentwicklung","worksFor":{"@type":"Organization","name":"Migros"},"affiliation":{"@type":"EducationalOrganization","name":"TBZ / BMS"},"email":"philippesaxer8@gmail.com","sameAs":["https://github.com/philippesaxer"]}
   </script>
   <link rel="stylesheet" href="/styles.css">
+  <link rel="stylesheet" href="/static-redesign.css">
 </head>
 <body tabindex="-1">
 <canvas id="scene" aria-hidden="true"></canvas>
@@ -64,9 +65,9 @@
       </div>
 
       <div class="about-block" id="ueber-mich">
-        <div><p class="section-label">Über mich</p><h2>Neugierig auf das,<br>was möglich ist.</h2></div>
+        <div><h2>Neugierig auf das,<br>was möglich ist.</h2></div>
         <div class="about-copy">
-          <p class="body-large">In meiner Ausbildung verbinde ich technische Grundlagen mit eigenen Ideen – von interaktiven Oberflächen über serverseitige Anwendungen bis zu vernetzten Systemen.</p>
+          <p class="body-large">In meiner Ausbildung verbinde ich technische Grundlagen mit eigenen Ideen, von interaktiven Oberflächen über serverseitige Anwendungen bis zu vernetzten Systemen.</p>
           <p>Mich interessieren künstliche Intelligenz und Machine Learning genauso wie Videospiele und deren Entwicklung. Besonders spannend finde ich, wie aus einer Idee durch Ausprobieren, Modellieren und Programmieren etwas Nutzbares entsteht.</p>
           <dl class="about-facts">
             <div><dt>Ausbildung</dt><dd>Informatiker EFZ<br><span>Applikationsentwicklung</span></dd></div>
@@ -80,7 +81,7 @@
   <section class="story-stage content-section" id="skills">
     <div class="access-copy container">
       <div class="section-heading">
-        <div><p class="section-label">Skills</p><h2>Mein Werkzeugkasten.</h2></div>
+        <div><h2>Mein Werkzeugkasten.</h2></div>
         <p>Technologien und Themen, mit denen ich in Projekten und Ausbildung arbeite.</p>
       </div>
       <div class="skills-grid">
@@ -108,20 +109,22 @@
   <section class="story-stage content-section projects-section" id="projekte">
     <div class="access-copy container">
       <div class="section-heading">
-        <div><p class="section-label">Projekte</p><h2>Ausgewählte Arbeiten.</h2></div>
+        <div><h2>Ausgewählte Arbeiten.</h2></div>
         <p>Persönliche Arbeiten und Projekte aus meiner Ausbildung.</p>
       </div>
       <div id="project-controls" class="project-grid">
         <article class="project-card">
+          <figure class="project-media"><img src="/project-images/beat-manager.webp" alt="Ausschnitt aus der Java-Serviceklasse des Beat-Managers" width="880" height="550" loading="lazy" decoding="async"></figure>
           <div class="project-content">
-            <p class="project-category">Web &amp; Interaktion</p>
-            <h3>Interaktives Portfolio</h3>
-            <p>Ein Portfolio als begehbarer 3D-Arbeitsplatz. Three.js und scrollgesteuerte Kamerafahrten verbinden die Szene mit zugänglichen HTML-Inhalten.</p>
-            <div class="badges"><span>JavaScript</span><span>Three.js</span><span>GSAP</span></div>
-            <div class="project-links"><a href="https://github.com/philippesaxer/philippe-portfolio" target="_blank" rel="noopener noreferrer">GitHub</a><a href="https://philippesaxer.ch/" target="_blank" rel="noopener noreferrer">Live ansehen</a></div>
+            <p class="project-category">Softwareentwicklung</p>
+            <h3>Beat-Manager</h3>
+            <p>Eine Java-Konsolenanwendung zur Verwaltung von Beat-Projekten und Spuren. Lizenzpreise werden über verschiedene Strategien berechnet, Projektdaten als CSV gespeichert.</p>
+            <div class="badges"><span>Java</span><span>CSV</span><span>OOP</span></div>
+            <div class="project-links"><a href="https://github.com/philippesaxer/Beat_Niveau_4" target="_blank" rel="noopener noreferrer">GitHub</a><a href="https://github.com/philippesaxer/Beat_Niveau_4#readme" target="_blank" rel="noopener noreferrer">Details</a></div>
           </div>
         </article>
         <article class="project-card">
+          <figure class="project-media"><img src="/project-images/the-gooners.webp" alt="Spielsituation aus dem 3D-Browserspiel The Gooners" width="1200" height="750" loading="lazy" decoding="async"></figure>
           <div class="project-content">
             <p class="project-category">Game &amp; 3D</p>
             <h3>The Gooners</h3>
@@ -131,6 +134,7 @@
           </div>
         </article>
         <article class="project-card">
+          <figure class="project-media"><img src="/project-images/quiz-code.webp" alt="Ausschnitt aus dem PHP-Quellcode des Quizspiels" width="880" height="550" loading="lazy" decoding="async"></figure>
           <div class="project-content">
             <p class="project-category">Programmierung &amp; Spiel</p>
             <h3>Wer wird Millionär?</h3>
@@ -140,6 +144,7 @@
           </div>
         </article>
         <article class="project-card">
+          <figure class="project-media"><img src="/project-images/compose-code.webp" alt="Ausschnitt aus der Docker-Compose-Konfiguration des Projekts" width="880" height="550" loading="lazy" decoding="async"></figure>
           <div class="project-content">
             <p class="project-category">Systeme &amp; Backend</p>
             <h3>Compose Demo</h3>
@@ -161,7 +166,7 @@
   <section class="story-stage content-section contact-section" id="kontakt">
     <div class="access-copy container">
       <div class="section-heading">
-        <div><p class="section-label">Kontakt</p><h2>Eine Idee?<br>Schreib mir.</h2></div>
+        <div><h2>Eine Idee?<br>Schreib mir.</h2></div>
         <p>Ob Frage, Projekt oder Austausch: Ich freue mich auf deine Nachricht.</p>
       </div>
       <div class="contact-grid">

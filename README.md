@@ -1,4 +1,4 @@
-﻿# Philippe Saxer – interaktives Portfolio
+# Philippe Saxer – interaktives Portfolio
 
 Ein prozeduraler Three.js-Arbeitsplatz mit scrollgesteuerter Kamera über GSAP ScrollTrigger. Die Inhalte und Projektlinks stehen zusätzlich als semantisches HTML zur Verfügung. Über «Inhalte lesen» lässt sich eine responsive Textansicht öffnen; ohne JavaScript oder WebGL erscheint sie automatisch.
 
@@ -34,4 +34,6 @@ Nach der Veröffentlichung Canonical-URL, Weiterleitungen, Sitemap und Projektli
 
 ## Projektbilder
 
-Die Projektkarten funktionieren ohne Bilder. Sobald eigene Bilder vorliegen, kann direkt vor dem jeweiligen Element `project-content` ein `figure` mit der Klasse `project-media` und einem Bild eingefügt werden. Die Gestaltung verwendet ein Verhältnis von 16:10 und `object-fit: cover`; passende Alternativtexte und `loading="lazy"` ergänzen. Dateien können lokal unter `public/` abgelegt werden.
+Die Projektkarten verwenden lokal gespeicherte WebP-Bilder unter `public/project-images/`. Es sind eigene Screenshots: aus der Quellcodeansicht des [Beat-Managers](https://github.com/philippesaxer/Beat_Niveau_4), dem Spiel [The Gooners](https://github.com/philippesaxer/spielprojekttbz) sowie den Quellcodeansichten des [Quizspiels](https://github.com/philippesaxer/werwirdmillion-r) und der [Compose-Demo](https://github.com/philippesaxer/m210/tree/main/compose-demo). Es werden keine externen Bilddienste geladen.
+
+Zum Austauschen einer Aufnahme die Bilddatei bzw. den Pfad und Alternativtext im jeweiligen `figure.project-media` in `index.html` ändern. Das Layout verwendet ein Verhältnis von 16:10 und `object-fit: cover`.
