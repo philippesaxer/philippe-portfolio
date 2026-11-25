@@ -1,39 +1,28 @@
-# Philippe Saxer – interaktives Portfolio
+# Philippe Saxer – Portfolio
 
-Ein prozeduraler Three.js-Arbeitsplatz mit scrollgesteuerter Kamera über GSAP ScrollTrigger. Die Inhalte und Projektlinks stehen zusätzlich als semantisches HTML zur Verfügung. Über «Inhalte lesen» lässt sich eine responsive Textansicht öffnen; ohne JavaScript oder WebGL erscheint sie automatisch.
+Die 3D-Ansicht öffnet sich beim normalen Einstieg und wird separat nachgeladen. Die Leseansicht funktioniert auch ohne JavaScript; direkte Links auf Inhalte öffnen sie unmittelbar. Die semantischen Projektkarten in `index.html` sind die gemeinsame Quelle für Titel, Kategorie, Kurzbeschreibung und Technologien in beiden Ansichten. Die Projektauswahl beruht auf öffentlichen Repositories und der früheren Projektdokumentation; Illustrationen sind als solche gekennzeichnet. Projekterklärungen stehen direkt bei den Karten.
 
 ## Lokal starten
 
 ```sh
 npm install
 npm run dev
+npm run build
+npm run preview
 ```
 
-`npm run build` erstellt die Produktionsfassung in `dist/`; `npm run preview` zeigt sie lokal an.
-
-## Auf GitHub Pages veröffentlichen
-
-In den Repository-Einstellungen unter **Pages → Build and deployment → Source** einmalig **GitHub Actions** auswählen. Danach baut `.github/workflows/deploy.yml` bei jedem Push auf `main` die Website und veröffentlicht den Inhalt von `dist/`. Die eigene Domain `philippesaxer.ch` bleibt in den Pages-Einstellungen und in `public/CNAME` hinterlegt. Die Quelldateien allein dürfen nicht direkt veröffentlicht werden, da der Browser die npm-Abhängigkeiten erst nach dem Vite-Build laden kann.
+Der Build in `dist/` wird über `.github/workflows/deploy.yml` auf GitHub Pages veröffentlicht. `public/CNAME`, `robots.txt` und `sitemap.xml` bleiben im Build erhalten.
 
 ## Bedienung
 
-Scrollen bewegt die Kamera. Die Tasten auf der 3D-Tastatur zeigen die zugehörigen Projekte, die Pfeile im Notizbuch blättern durch vier Seiten, und das Telefon enthält Kontakt und Datenschutzeinstellungen.
-
-## Suche und Pflege
-
-Die Website enthält eine indexierbare Startseite. `public/robots.txt` und `public/sitemap.xml` werden beim Build unverändert veröffentlicht. Die statische Ansicht verlinkt ausgewählte öffentliche GitHub-Repositories und, soweit vorhanden, eine Live-Ansicht. Die Inhalte, Projektangaben, JSON-LD und die 3D-Texte sollten bei Änderungen gemeinsam aktualisiert werden. Die EFZ-Ausbildung ist als angestrebter Abschluss beschrieben, nicht als erworbene Qualifikation.
-
-Nach der Veröffentlichung Canonical-URL, Weiterleitungen, Sitemap und Projektlinks auf dem Zielserver prüfen und die Sitemap in der jeweiligen Suchmaschinen-Konsole einreichen. Rankings, Indexierung und Darstellung in KI-Antworten können nicht garantiert werden. Web-Vitals-Werte müssen mit echten Nutzungsdaten und auf realen Geräten gemessen werden.
+In der 3D-Ansicht wählen die Punkte am rechten Rand den Standort; die Linie zeigt den Fortschritt. Die Schaltfläche auf dem Bildschirm öffnet die Leseansicht; für Tastaturbedienung erscheinen die entsprechenden Aktionen beim Fokussieren. Im Projektnotizbuch kann man blättern und einen Eintrag zur eigenen Projekterklärung öffnen. In der Leseansicht wechselt das Projektkarussell automatisch; Punkte und Pfeile steuern es. Es hält beim Darüberfahren, bei Tastaturfokus oder während einer geöffneten Projekterklärung an. Bei reduzierter Bewegung gibt es keinen automatischen Wechsel. Die Leseansicht und der direkte E-Mail-Link bleiben jederzeit verfügbar. Bei fehlendem JavaScript, WebGL oder einem fehlgeschlagenen 3D-Download bleibt die Leseansicht nutzbar. Bei Kontextverlust bitte die Seite neu laden. Reduzierte Bewegung deaktiviert Kamerafahrten.
 
 ## Vor einer Veröffentlichung
 
-- Impressum, Datenschutzhinweise und Nutzungsbedingungen mit den vollständigen, rechtlich passenden Angaben ergänzen und prüfen lassen.
-- Kontakt und Newsletter bereiten eine Nachricht im E-Mail-Programm vor; es gibt keinen Versandserver und keine automatische Newsletter-Anmeldung. Ein späteres Backend muss serverseitig validieren und einen echten CSRF-Schutz bereitstellen.
-- Optionale Integrationen ausschliesslich über den Consent-Manager in `scene.js` registrieren und ihre Datenverarbeitung in der Datenschutzerklärung beschreiben.
-- Die Projektlinks und die E-Mail-Adresse vor einer Veröffentlichung erneut prüfen.
+- Die unterschiedlichen Schulbezeichnungen BMZ und TBZ / BMS sind nicht belegt und wurden daher vorläufig nicht genannt. Die richtige Bezeichnung ergänzen.
+- Persönlichen Beitrag, Zeitraum, Status und Lernerfahrungen für die Projekte anhand eigener Angaben ergänzen; vorhandene Beschreibungen und Links überprüfen.
+- Vollständiges Impressum und Datenschutzhinweise, insbesondere Hosting und Verbindungsdaten, mit den tatsächlichen Angaben ergänzen und rechtlich prüfen lassen.
+- Es sind keine Analyse- oder Werbedienste und kein Formularversand eingebunden. Falls sich dies ändert, Datenschutz und erforderliche Einwilligungen neu prüfen.
+- Nach der Veröffentlichung Canonical-URL, Weiterleitungen, Sitemap, E-Mail und Projektlinks prüfen. Leistung mit echten Nutzungsdaten und auf realen Geräten messen.
 
-## Projektbilder
-
-Die Projektkarten verwenden lokal gespeicherte WebP-Bilder unter `public/project-images/`. Es sind eigene Screenshots: aus der Quellcodeansicht des [Beat-Managers](https://github.com/philippesaxer/Beat_Niveau_4), dem Spiel [The Gooners](https://github.com/philippesaxer/spielprojekttbz) sowie den Quellcodeansichten des [Quizspiels](https://github.com/philippesaxer/werwirdmillion-r) und der [Compose-Demo](https://github.com/philippesaxer/m210/tree/main/compose-demo). Es werden keine externen Bilddienste geladen.
-
-Zum Austauschen einer Aufnahme die Bilddatei bzw. den Pfad und Alternativtext im jeweiligen `figure.project-media` in `index.html` ändern. Das Layout verwendet ein Verhältnis von 16:10 und `object-fit: cover`.
+Die lokalen WebP-Dateien in `public/project-images/` zeigen vorhandene Projektaufnahmen und -grafiken; die Migros-Prop-Hunt-Illustration ist als solche gekennzeichnet. Die Uhr-Aufnahme zeigt den geprüften Stand der öffentlichen Version. Aktualisierungen erfolgen in der jeweiligen Projektkarte in `index.html`.

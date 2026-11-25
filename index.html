@@ -7,7 +7,7 @@
   <link rel="icon" type="image/png" sizes="48x48" href="/favicon-48.png">
   <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
   <title>Philippe Saxer | Informatik-Lernender &amp; Entwickler-Portfolio</title>
-  <meta name="description" content="Philippe Saxer lernt Informatik EFZ Applikationsentwicklung bei Migros und an der TBZ / BMS. Projekte, Fähigkeiten und Kontakt.">
+  <meta name="description" content="Philippe Saxer lernt Informatik EFZ Applikationsentwicklung bei Migros. Projekte, Fähigkeiten und Kontakt.">
   <link rel="canonical" href="https://philippesaxer.ch/">
   <meta property="og:type" content="website"><meta property="og:locale" content="de_CH">
   <meta property="og:site_name" content="Philippe Saxer – Portfolio">
@@ -15,23 +15,16 @@
   <meta property="og:description" content="Projekte und Einblicke in Webentwicklung, Programmierung und die Informatiklehre von Philippe Saxer.">
   <meta property="og:url" content="https://philippesaxer.ch/"><meta property="og:image" content="https://philippesaxer.ch/social-card.png">
   <meta name="twitter:card" content="summary_large_image"><meta name="twitter:image" content="https://philippesaxer.ch/social-card.png">
-  <noscript><style>#contact-form,.copy-email{display:none}</style></noscript>
+  <noscript><style>.js-only{display:none!important}</style></noscript>
   <script type="application/ld+json">
-  {"@context":"https://schema.org","@type":"Person","name":"Philippe Saxer","url":"https://philippesaxer.ch/","jobTitle":"Lernender Informatiker EFZ, Fachrichtung Applikationsentwicklung","worksFor":{"@type":"Organization","name":"Migros"},"affiliation":{"@type":"EducationalOrganization","name":"TBZ / BMS"},"email":"philippesaxer8@gmail.com","sameAs":["https://github.com/philippesaxer"]}
+  {"@context":"https://schema.org","@type":"Person","name":"Philippe Saxer","url":"https://philippesaxer.ch/","jobTitle":"Lernender Informatiker EFZ, Fachrichtung Applikationsentwicklung","worksFor":{"@type":"Organization","name":"Migros"},"email":"philippesaxer8@gmail.com","sameAs":["https://github.com/philippesaxer"]}
   </script>
   <link rel="stylesheet" href="/styles.css">
   <link rel="stylesheet" href="/static-redesign.css">
 </head>
 <body tabindex="-1">
+<a class="skip-link" href="#journey">Zum Hauptinhalt springen</a>
 <canvas id="scene" aria-hidden="true"></canvas>
-<dialog id="phone-form-dialog" aria-labelledby="phone-form-title">
-  <div class="phone-form-header">
-    <h2 id="phone-form-title"></h2>
-    <button type="button" id="phone-form-close" aria-label="Formular schliessen">×</button>
-  </div>
-  <div id="phone-form-content"></div>
-</dialog>
-
 <header class="site-header">
   <div class="nav-inner">
     <a class="brand" href="#start" aria-label="Philippe Saxer, zum Anfang">
@@ -43,19 +36,37 @@
       <a href="#skills">Skills</a>
       <a href="#projekte">Projekte</a>
       <a href="#kontakt">Kontakt</a>
-      <a href="https://github.com/philippesaxer" target="_blank" rel="noopener noreferrer">GitHub</a>
+      <a href="https://github.com/philippesaxer" target="_blank" rel="noopener noreferrer">GitHub <span class="external-note">(öffnet neuen Tab)</span></a>
     </nav>
-    <button id="view-toggle" class="view-toggle" type="button" hidden>Zurück zur 3D-Ansicht</button>
+    <button id="view-toggle" class="view-toggle" type="button" aria-label="3D-Ansicht öffnen" hidden>3D-Ansicht</button>
   </div>
 </header>
 
-<main id="journey" aria-label="Philippes Portfolio">
+<nav id="scene-navigation" class="scene-navigation" aria-label="3D-Stationen" hidden>
+  <button type="button" data-station="start" aria-label="Start"><span aria-hidden="true">Start</span></button>
+  <button type="button" data-station="skills" aria-label="Skills"><span aria-hidden="true">Skills</span></button>
+  <button type="button" data-station="projekte" aria-label="Projekte"><span aria-hidden="true">Projekte</span></button>
+  <button type="button" data-station="notizen" aria-label="Programmieren"><span aria-hidden="true">Programmieren</span></button>
+  <button type="button" data-station="notizen-ki" aria-label="KI und Lernen"><span aria-hidden="true">KI und Lernen</span></button>
+  <button type="button" data-station="notizen-games" aria-label="Videospiele"><span aria-hidden="true">Videospiele</span></button>
+  <button type="button" data-station="kontakt" aria-label="Kontakt"><span aria-hidden="true">Kontakt</span></button>
+</nav>
+<div id="scene-access" class="scene-access" hidden>
+  <button type="button" id="scene-read">Leseansicht öffnen</button>
+  <div id="scene-pages" hidden>
+    <button type="button" id="scene-previous">Vorherige Projektseite</button>
+    <button type="button" id="scene-next">Nächste Projektseite</button>
+    <span id="scene-page-status" class="visually-hidden" aria-live="polite"></span>
+  </div>
+</div>
+<p id="scene-status" class="scene-status" role="status"></p>
+<main id="journey" aria-label="Philippes Portfolio" tabindex="-1">
   <section class="story-stage hero" id="start">
     <div class="access-copy container">
       <div class="hero-grid">
         <div class="hero-copy">
           <h1 tabindex="-1">Hallo, ich bin<br><span>Philippe.</span></h1>
-          <p class="hero-lead">Ich interessiere mich für Webentwicklung, künstliche Intelligenz und Spiele. Bei Migros lerne ich, Software zu entwickeln.</p>
+          <p class="hero-lead">Bei Migros lerne ich, Software zu entwickeln: von Weboberflächen bis zu Anwendungen und vernetzten Systemen. Besonders interessieren mich künstliche Intelligenz und Spieleentwicklung.</p>
           <div class="actions">
             <a class="button button-primary" href="#projekte">Projekte ansehen</a>
             <a class="button button-secondary" href="#kontakt">Kontakt aufnehmen</a>
@@ -71,7 +82,7 @@
           <p>Mich interessieren künstliche Intelligenz und Machine Learning genauso wie Videospiele und deren Entwicklung. Besonders spannend finde ich, wie aus einer Idee durch Ausprobieren, Modellieren und Programmieren etwas Nutzbares entsteht.</p>
           <dl class="about-facts">
             <div><dt>Ausbildung</dt><dd>Informatiker EFZ<br><span>Applikationsentwicklung</span></dd></div>
-            <div><dt>Lernorte</dt><dd>Migros<br><span>TBZ und BMS</span></dd></div>
+            <div><dt>Lehrbetrieb</dt><dd>Migros</dd></div>
           </dl>
         </div>
       </div>
@@ -101,8 +112,6 @@
           <div class="badges"><span>Git</span><span>Docker</span><span>REST</span><span>Vernetzte Geräte</span></div>
         </article>
       </div>
-      <div id="skill-controls" class="scene-controls" aria-hidden="true"></div>
-      <p id="skill-status" class="scene-controls" aria-live="polite"></p>
     </div>
   </section>
 
@@ -112,50 +121,52 @@
         <div><h2>Ausgewählte Arbeiten.</h2></div>
         <p>Persönliche Arbeiten und Projekte aus meiner Ausbildung.</p>
       </div>
-      <div id="project-controls" class="project-grid">
+      <div id="project-controls" class="project-grid" role="region" aria-label="Projekte" tabindex="0">
         <article class="project-card">
-          <figure class="project-media"><img src="/project-images/beat-manager.webp" alt="Ausschnitt aus der Java-Serviceklasse des Beat-Managers" width="880" height="550" loading="lazy" decoding="async"></figure>
-          <div class="project-content">
-            <p class="project-category">Softwareentwicklung</p>
-            <h3>Beat-Manager</h3>
-            <p>Eine Java-Konsolenanwendung zur Verwaltung von Beat-Projekten und Spuren. Lizenzpreise werden über verschiedene Strategien berechnet, Projektdaten als CSV gespeichert.</p>
-            <div class="badges"><span>Java</span><span>CSV</span><span>OOP</span></div>
-            <div class="project-links"><a href="https://github.com/philippesaxer/Beat_Niveau_4" target="_blank" rel="noopener noreferrer">GitHub</a><a href="https://github.com/philippesaxer/Beat_Niveau_4#readme" target="_blank" rel="noopener noreferrer">Details</a></div>
-          </div>
+          <div class="project-content"><p class="project-category">Softwareentwicklung</p><h3>Beat-Manager</h3><p class="project-summary">Eine Java-Konsolenanwendung zur Verwaltung von Beat-Projekten und Spuren. Lizenzpreise werden über verschiedene Strategien berechnet, Projektdaten als CSV gespeichert.</p><div class="badges"><span>Java</span><span>CSV</span><span>OOP</span></div></div>
+          <figure class="project-media"><div class="project-image project-image--code"><img src="/project-images/beat-manager.webp" alt="Ausschnitt aus der Java-Serviceklasse des Beat-Managers" width="880" height="550" loading="lazy" decoding="async"></div><figcaption>Java-Code aus dem Repository</figcaption></figure>
+          <details class="case-study" id="projekt-beat-manager"><summary>Beat-Manager: Projekterklärung lesen</summary><div><h4>Ausgangslage und Umsetzung</h4><p>Die Anwendung verwaltet Beat-Projekte und ihre Spuren in der Konsole. Die Java-Anwendung organisiert Projektdaten und berechnet Lizenzpreise über verschiedene Strategien. Die Daten werden als CSV gespeichert.</p><p><strong>Stand:</strong> Der Quellcode ist im Repository verfügbar. Persönlicher Beitrag, Zeitraum und Lernerfahrungen sind noch zu ergänzen.</p><a href="https://github.com/philippesaxer/Beat_Niveau_4" target="_blank" rel="noopener noreferrer">Beat-Manager auf GitHub <span class="external-note">(öffnet neuen Tab)</span></a></div></details>
         </article>
         <article class="project-card">
-          <figure class="project-media"><img src="/project-images/the-gooners.webp" alt="Spielsituation aus dem 3D-Browserspiel The Gooners" width="1200" height="750" loading="lazy" decoding="async"></figure>
-          <div class="project-content">
-            <p class="project-category">Game &amp; 3D</p>
-            <h3>The Gooners</h3>
-            <p>Ein First-Person-Browserspiel mit Three.js: Steuerung, Projektilen und verfolgenden Bots. Ein HUD zeigt Spielzustand und Punktestand.</p>
-            <div class="badges"><span>JavaScript</span><span>Three.js</span><span>HTML</span><span>CSS</span></div>
-            <div class="project-links"><a href="https://github.com/philippesaxer/spielprojekttbz" target="_blank" rel="noopener noreferrer">GitHub</a><a href="https://github.com/philippesaxer/spielprojekttbz#readme" target="_blank" rel="noopener noreferrer">Details</a></div>
-          </div>
+          <div class="project-content"><p class="project-category">Game und Multiplayer</p><h3>Drunk Drivers.io</h3><p class="project-summary">Ein 2D-Multiplayer-Spiel im Browser mit Fahrzeugen, Spielräumen und Punktestand. Der Server synchronisiert das Spiel über Socket.IO.</p><div class="badges"><span>JavaScript</span><span>Canvas</span><span>Node.js</span><span>Socket.IO</span></div></div>
+          <figure class="project-media"><div class="project-image project-image--graphic"><img src="/project-images/drunk-drivers-grafik.webp" alt="Projektgrafik zu Drunk Drivers.io aus dem Repository" width="512" height="512" loading="lazy" decoding="async"></div><figcaption>Projektgrafik aus dem Repository</figcaption></figure>
+          <details class="case-study" id="projekt-drunk-drivers"><summary>Drunk Drivers.io: Projekterklärung lesen</summary><div><h4>Ausgangslage und Umsetzung</h4><p>Ein Browserspiel mit gemeinsamer Arena und anpassbaren Fahrzeugen. Die Darstellung nutzt Canvas; ein Node.js-Server verwaltet Spielräume und überträgt den Spielzustand mit Socket.IO.</p><p><strong>Stand:</strong> Der Quellcode beziehungsweise die Dokumentation ist auf GitHub verfügbar. Weitere persönliche Beiträge und Lernerfahrungen sind noch zu ergänzen.</p><a href="https://github.com/philippesaxer/drunkdrivers" target="_blank" rel="noopener noreferrer">Drunk Drivers.io auf GitHub <span class="external-note">(öffnet neuen Tab)</span></a></div></details>
         </article>
         <article class="project-card">
-          <figure class="project-media"><img src="/project-images/quiz-code.webp" alt="Ausschnitt aus dem PHP-Quellcode des Quizspiels" width="880" height="550" loading="lazy" decoding="async"></figure>
-          <div class="project-content">
-            <p class="project-category">Programmierung &amp; Spiel</p>
-            <h3>Wer wird Millionär?</h3>
-            <p>Ein Quiz für die Kommandozeile mit Fragen, Antworten und 50:50-Joker. Die Spiellogik verarbeitet Eingaben und wertet Antworten in PHP aus.</p>
-            <div class="badges"><span>PHP</span><span>CLI</span><span>Docker</span></div>
-            <div class="project-links"><a href="https://github.com/philippesaxer/werwirdmillion-r" target="_blank" rel="noopener noreferrer">GitHub</a><a href="https://github.com/philippesaxer/werwirdmillion-r/blob/main/code/millioner.php" target="_blank" rel="noopener noreferrer">Code ansehen</a></div>
-          </div>
+          <div class="project-content"><p class="project-category">Game und Konzept</p><h3>Migros Prop Hunt</h3><p class="project-summary">Ein früher dokumentiertes Schulprojekt: Spielende tarnen sich als Migros-Produkte und verstecken sich vor einem Jäger.</p><div class="badges"><span>Game Design</span><span>Schulprojekt</span></div></div>
+          <figure class="project-media"><div class="project-image"><img src="/project-images/migros-prophunt.webp" alt="Illustration zur Spielidee Migros Prop Hunt aus dem früheren Portfolio" width="960" height="540" loading="lazy" decoding="async"></div><figcaption>Illustration aus dem früheren Portfolio, keine Spielaufnahme</figcaption></figure>
+          <details class="case-study" id="projekt-migros-prop-hunt"><summary>Migros Prop Hunt: Projekterklärung lesen</summary><div><h4>Projektidee und Dokumentation</h4><p>Die frühere Portfolioseite beschreibt ein Schulprojekt nach dem Prop-Hunt-Prinzip: Spielende verkleiden sich als Produkte und verstecken sich vor einem Jäger. Dort wird das Projekt als abgeschlossen bezeichnet.</p><p><strong>Stand:</strong> Öffentlich liegt die frühere Projektbeschreibung vor; der Spielquellcode ist dort nicht enthalten. Persönlicher Beitrag und Umsetzung sind noch zu ergänzen.</p><a href="https://github.com/philippesaxer/portfolio/blob/main/projekt-migrosprophunt.html" target="_blank" rel="noopener noreferrer">Projektbeschreibung von Migros Prop Hunt auf GitHub <span class="external-note">(öffnet neuen Tab)</span></a></div></details>
         </article>
         <article class="project-card">
-          <figure class="project-media"><img src="/project-images/compose-code.webp" alt="Ausschnitt aus der Docker-Compose-Konfiguration des Projekts" width="880" height="550" loading="lazy" decoding="async"></figure>
-          <div class="project-content">
-            <p class="project-category">Systeme &amp; Backend</p>
-            <h3>Compose Demo</h3>
-            <p>Eine kleine Flask-Anwendung zählt Aufrufe mit Redis. Docker Compose verbindet Web- und Datendienst zu einer lokalen Entwicklungsumgebung.</p>
-            <div class="badges"><span>Python</span><span>Flask</span><span>Redis</span><span>Docker</span></div>
-            <div class="project-links"><a href="https://github.com/philippesaxer/m210" target="_blank" rel="noopener noreferrer">GitHub</a><a href="https://github.com/philippesaxer/m210/tree/main/compose-demo" target="_blank" rel="noopener noreferrer">Details</a></div>
-          </div>
+          <div class="project-content"><p class="project-category">Game und 3D</p><h3>The Gooners</h3><p class="project-summary">Ein First-Person-Browserspiel mit Three.js: Steuerung, Projektilen und verfolgenden Bots. Ein HUD zeigt Spielzustand und Punktestand.</p><div class="badges"><span>JavaScript</span><span>Three.js</span><span>HTML</span><span>CSS</span></div></div>
+          <figure class="project-media"><div class="project-image project-image--code"><img src="/project-images/the-gooners.webp" alt="Spielsituation aus dem 3D-Browserspiel The Gooners" width="1200" height="750" loading="lazy" decoding="async"></div><figcaption>Spielsituation aus The Gooners</figcaption></figure>
+          <details class="case-study" id="projekt-the-gooners"><summary>The Gooners: Projekterklärung lesen</summary><div><h4>Ausgangslage und Umsetzung</h4><p>Das Projekt erkundet ein First-Person-Spiel im Browser. Three.js stellt die Szene dar; Steuerung, Projektile, Bots und ein HUD bilden die beschriebenen Spielelemente.</p><p><strong>Stand:</strong> Der Quellcode ist im Repository verfügbar. Persönlicher Beitrag, Zeitraum und Lernerfahrungen sind noch zu ergänzen.</p><a href="https://github.com/philippesaxer/spielprojekttbz" target="_blank" rel="noopener noreferrer">The Gooners auf GitHub <span class="external-note">(öffnet neuen Tab)</span></a></div></details>
+        </article>
+        <article class="project-card">
+          <div class="project-content"><p class="project-category">Programmierung und Spiel</p><h3>Wer wird Millionär?</h3><p class="project-summary">Ein Quiz für die Kommandozeile mit Fragen, Antworten und 50:50-Joker. Die Spiellogik verarbeitet Eingaben und wertet Antworten in PHP aus.</p><div class="badges"><span>PHP</span><span>CLI</span><span>Docker</span></div></div>
+          <figure class="project-media"><div class="project-image project-image--code"><img src="/project-images/quiz-code.webp" alt="Ausschnitt aus dem PHP-Quellcode des Quizspiels" width="880" height="550" loading="lazy" decoding="async"></div><figcaption>PHP-Code aus dem Repository</figcaption></figure>
+          <details class="case-study" id="projekt-quiz"><summary>Wer wird Millionär?: Projekterklärung lesen</summary><div><h4>Ausgangslage und Umsetzung</h4><p>Das Quiz überträgt Fragen und Antwortmöglichkeiten in die Kommandozeile. PHP verarbeitet die Eingaben, wertet Antworten aus und bietet einen 50:50-Joker.</p><p><strong>Stand:</strong> Der Quellcode ist im Repository verfügbar. Persönlicher Beitrag, Zeitraum und Lernerfahrungen sind noch zu ergänzen.</p><a href="https://github.com/philippesaxer/werwirdmillion-r" target="_blank" rel="noopener noreferrer">Wer wird Millionär? auf GitHub <span class="external-note">(öffnet neuen Tab)</span></a></div></details>
+        </article>
+        <article class="project-card">
+          <div class="project-content"><p class="project-category">Systeme und Backend</p><h3>Compose Demo</h3><p class="project-summary">Eine kleine Flask-Anwendung zählt Aufrufe mit Redis. Docker Compose verbindet Web- und Datendienst zu einer lokalen Entwicklungsumgebung.</p><div class="badges"><span>Python</span><span>Flask</span><span>Redis</span><span>Docker</span></div></div>
+          <figure class="project-media"><div class="project-image project-image--code"><img src="/project-images/compose-code.webp" alt="Ausschnitt aus der Docker-Compose-Konfiguration des Projekts" width="880" height="550" loading="lazy" decoding="async"></div><figcaption>Compose-Konfiguration aus dem Repository</figcaption></figure>
+          <details class="case-study" id="projekt-compose-demo"><summary>Compose Demo: Projekterklärung lesen</summary><div><h4>Ausgangslage und Umsetzung</h4><p>Die Demo verbindet eine kleine Flask-Anwendung mit Redis. Docker Compose startet den Web- und den Datendienst als lokale Entwicklungsumgebung; die Anwendung zählt Aufrufe.</p><p><strong>Stand:</strong> Der Quellcode ist im Repository verfügbar. Persönlicher Beitrag, Zeitraum und Lernerfahrungen sind noch zu ergänzen.</p><a href="https://github.com/philippesaxer/m210/tree/main/compose-demo" target="_blank" rel="noopener noreferrer">Compose Demo auf GitHub <span class="external-note">(öffnet neuen Tab)</span></a></div></details>
+        </article>
+        <article class="project-card">
+          <div class="project-content"><p class="project-category">Frontend und UI</p><h3>Analoge Uhr</h3><p class="project-summary">Eine analoge Uhr als Browser-Projekt mit CSS und JavaScript. Die Zeigeraktualisierung der geprüften Version benötigt eine Korrektur.</p><div class="badges"><span>HTML</span><span>CSS</span><span>JavaScript</span></div></div>
+          <figure class="project-media"><div class="project-image project-image--clock"><img src="/project-images/analoge-uhr.webp" alt="Ansicht der analogen Uhr in der geprüften öffentlichen Version" width="416" height="416" loading="lazy" decoding="async"></div><figcaption>Ansicht der öffentlich verfügbaren Version</figcaption></figure>
+          <details class="case-study" id="projekt-analog-uhr"><summary>Analoge Uhr: Projekterklärung lesen</summary><div><h4>Ausgangslage und Umsetzung</h4><p>Das Projekt zeigt eine analoge Uhr. Laut Repository stammen CSS und JavaScript von Philippe; die HTML-Grundlage stammt von Reto Fröhlicher. In der geprüften Fassung verhindert ein JavaScript-Fehler die Aktualisierung der Zeiger.</p><p><strong>Stand:</strong> Der Quellcode beziehungsweise die Dokumentation ist auf GitHub verfügbar. Weitere persönliche Beiträge und Lernerfahrungen sind noch zu ergänzen.</p><a href="https://github.com/philippesaxer/analogclock" target="_blank" rel="noopener noreferrer">Analoge Uhr auf GitHub <span class="external-note">(öffnet neuen Tab)</span></a></div></details>
         </article>
       </div>
-      <div class="scene-controls" aria-hidden="true"><button id="previous-page" type="button" tabindex="-1">Vorherige Notizbuchseite</button><button id="next-page" type="button" tabindex="-1">Nächste Notizbuchseite</button><p id="page-status" aria-live="polite"></p></div>
-      <a class="more-projects" href="https://github.com/philippesaxer" target="_blank" rel="noopener noreferrer">Weitere Projekte auf GitHub <span aria-hidden="true">↗</span></a>
+      <div class="project-carousel-navigation" id="project-carousel-navigation" role="group" aria-label="Projektkarussell bedienen" hidden>
+        <div class="project-carousel-dots" id="project-carousel-dots" aria-label="Projekt auswählen"></div>
+        <div class="project-carousel-actions">
+          <button type="button" id="project-carousel-prev" aria-label="Vorheriges Projekt">←</button>
+          <span id="project-carousel-status" aria-live="off"></span>
+          <button type="button" id="project-carousel-next" aria-label="Nächstes Projekt">→</button>
+        </div>
+      </div>
+      <a class="more-projects" href="https://github.com/philippesaxer" target="_blank" rel="noopener noreferrer">Weitere Projekte auf GitHub <span aria-hidden="true">↗</span> <span class="external-note">(öffnet neuen Tab)</span></a>
     </div>
   </section>
 
@@ -174,24 +185,11 @@
           <h3>Direkter Kontakt</h3>
           <p>Am besten erreichst du mich per E-Mail.</p>
           <a class="email-link" href="mailto:philippesaxer8@gmail.com">philippesaxer8@gmail.com</a>
-          <button class="copy-email" type="button">E-Mail kopieren</button>
+          <button class="copy-email js-only" type="button">E-Mail kopieren</button>
           <p id="copy-status" class="copy-status" role="status"></p>
-          <a class="contact-social" href="https://github.com/philippesaxer" target="_blank" rel="noopener noreferrer">GitHub-Profil <span aria-hidden="true">↗</span></a>
+          <a class="contact-social" href="https://github.com/philippesaxer" target="_blank" rel="noopener noreferrer">GitHub-Profil <span aria-hidden="true">↗</span> <span class="external-note">(öffnet neuen Tab)</span></a>
         </div>
-        <form id="contact-form" class="contact-form" novalidate>
-          <h3>Nachricht schreiben</h3>
-          <input type="hidden" name="csrf_token" value="">
-          <div hidden aria-hidden="true"><label for="website">Website</label><input id="website" name="website" tabindex="-1" autocomplete="off"></div>
-          <label for="name">Dein Name</label>
-          <input id="name" name="name" aria-describedby="contact-status" autocomplete="name" enterkeyhint="next" required maxlength="100" placeholder="Vor- und Nachname">
-          <label for="email">Deine E-Mail</label>
-          <input id="email" name="email" aria-describedby="contact-status" type="email" autocomplete="email" inputmode="email" enterkeyhint="next" required maxlength="254" placeholder="name@beispiel.ch">
-          <label for="message">Deine Nachricht</label>
-          <textarea id="message" name="message" aria-describedby="contact-status" enterkeyhint="done" required maxlength="3000" rows="5" placeholder="Worum geht es?"></textarea>
-          <button class="button button-primary" type="submit">E-Mail vorbereiten</button>
-          <p class="form-note">Öffnet dein E-Mail-Programm. Die Nachricht wird erst dort gesendet.</p>
-          <p id="contact-status" role="status"></p>
-        </form>
+
       </div>
     </div>
   </section>
@@ -203,19 +201,12 @@
       <a class="brand" href="#start" aria-label="Philippe Saxer, zum Anfang"><span class="brand-logo"><img src="/logo.png" alt="" width="192" height="192"></span><span class="brand-name">Philippe Saxer</span></a>
       <p>Informatik-Lernender<br>Applikationsentwicklung</p>
     </div>
-    <div><h2>Impressum</h2><p>Philippe Saxer<br>5200 Brugg, Schweiz</p><a href="mailto:philippesaxer8@gmail.com">philippesaxer8@gmail.com</a></div>
-    <div><h2>Datenschutz</h2><p>Keine externen Schriftarten oder Analyse-Dienste. E-Mails werden in deinem E-Mail-Programm erstellt. Die 3D-Ansicht kann deine Technologieauswahl lokal speichern.</p></div>
-    <div><h2>Navigation</h2><a href="#start">Zurück nach oben</a><a href="https://github.com/philippesaxer" target="_blank" rel="noopener noreferrer">GitHub</a></div>
+    <div id="impressum"><h2>Impressum</h2><p>Philippe Saxer<br>5200 Brugg, Schweiz</p><p>Vollständige Anschrift und rechtliche Angaben sind noch zu ergänzen und zu prüfen.</p><a href="mailto:philippesaxer8@gmail.com">philippesaxer8@gmail.com</a></div>
+    <div id="datenschutz"><h2>Datenschutz</h2><p>Diese Website verwendet derzeit keine externen Schriftarten, Analyse- oder Werbedienste. Beim Aufruf verarbeitet der Hosting-Anbieter technische Verbindungsdaten; Einzelheiten und vollständige Datenschutzhinweise sind noch zu ergänzen und zu prüfen. E-Mail-Links öffnen dein E-Mail-Programm.</p></div>
+    <div><h2>Navigation</h2><a href="#start">Zurück nach oben</a><a href="https://github.com/philippesaxer" target="_blank" rel="noopener noreferrer">GitHub <span class="external-note">(öffnet neuen Tab)</span></a></div>
   </div>
   <div class="container footer-bottom">© Philippe Saxer</div>
 </footer>
-<div hidden aria-hidden="true">
-  <form id="newsletter-form" novalidate>
-    <input type="hidden" name="csrf_token" value="">
-    <div hidden aria-hidden="true"><label for="newsletter-website">Website</label><input id="newsletter-website" name="website" tabindex="-1" autocomplete="off"></div>
-    <label for="newsletter-email">Deine E-Mail</label><input id="newsletter-email" name="email" aria-describedby="newsletter-status" type="email" required maxlength="254" autocomplete="email" inputmode="email" enterkeyhint="done"><button type="submit">Anfrage zu Neuigkeiten vorbereiten</button><p id="newsletter-status" role="status"></p>
-  </form>
-</div>
 <script type="module" src="/main.js"></script>
 </body>
 </html>

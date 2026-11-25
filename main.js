@@ -1,104 +1,221 @@
-import { initScene } from './scene.js';
-
-// The scene keeps its original project and skill data independently of the 2D selection.
+// The semantic project cards are the shared source for the reading and 3D views.
+const projects = [...document.querySelectorAll('.project-card')].map(card => [
+  card.querySelector('h3').textContent,
+  card.querySelector('.project-category').textContent,
+  card.querySelector('.project-summary').textContent,
+  card.querySelector('details')?.id || '',
+  [...card.querySelectorAll('.badges span')].map(tag => tag.textContent)
+]);
+// All cards stay in the document. Without JavaScript they remain a simple grid.
+const projectGrid = document.querySelector('#project-controls');
+const projectCards = [...projectGrid.querySelectorAll('.project-card')];
+const carouselNavigation = document.querySelector('#project-carousel-navigation');
+const carouselDots = document.querySelector('#project-carousel-dots');
+const carouselPrevious = document.querySelector('#project-carousel-prev');
+const carouselNext = document.querySelector('#project-carousel-next');
+const carouselStatus = document.querySelector('#project-carousel-status');
+const carouselArea = document.querySelector('#projekte .access-copy');
+const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
+let currentProject = 0;
+let automatic = !reducedMotion.matches;
+let carouselVisible = false;
+let carouselHovered = false;
+let carouselFocused = false;
+let carouselInteracting = false;
+let rotationTimer, scrollTimer;
+const dots = projectCards.map((card, index) => {
+  const dot = document.createElement('button');
+  dot.type = 'button';
+  dot.setAttribute('aria-label', `Projekt ${index + 1} von ${projectCards.length}: ${card.querySelector('h3').textContent}`);
+  dot.setAttribute('aria-controls', 'project-controls');
+  dot.addEventListener('click', () => goToProject(index));
+  carouselDots.append(dot);
+  return dot;
+});
+projectGrid.classList.add('carousel-enabled');
+projectGrid.setAttribute('aria-roledescription', 'Karussell');
+carouselNavigation.hidden = false;
+function syncCarouselControls() {
+  carouselStatus.textContent = `${currentProject + 1} / ${projectCards.length}`;
+  carouselPrevious.disabled = currentProject === 0;
+  carouselNext.disabled = currentProject === projectCards.length - 1;
+  dots.forEach((dot, index) => {
+    if (index === currentProject) dot.setAttribute('aria-current', 'true');
+    else dot.removeAttribute('aria-current');
+  });
+}
+function updateCarousel() {
+  if (document.body.classList.contains('immersive') || !projectGrid.clientWidth) return;
+  const bounds = projectGrid.getBoundingClientRect();
+  const center = bounds.left + bounds.width / 2;
+  currentProject = projectCards.reduce((best, card, index) => {
+    const rect = card.getBoundingClientRect();
+    return Math.abs(rect.left + rect.width / 2 - center) < best.distance
+      ? {index, distance: Math.abs(rect.left + rect.width / 2 - center)} : best;
+  }, {index: 0, distance: Infinity}).index;
+  syncCarouselControls();
+}
+function scheduleRotation() {
+  clearTimeout(rotationTimer);
+  if (!automatic || !carouselVisible || carouselHovered || carouselFocused || carouselInteracting || document.hidden || document.body.classList.contains('immersive') || projectCards[currentProject].querySelector('details[open]')) return;
+  rotationTimer = setTimeout(() => goToProject((currentProject + 1) % projectCards.length), 6000);
+}
+function goToProject(index, instant = false) {
+  if (index < 0 || index >= projectCards.length) return;
+  const bounds = projectGrid.getBoundingClientRect();
+  const card = projectCards[index].getBoundingClientRect();
+  const offset = card.left + card.width / 2 - (bounds.left + bounds.width / 2);
+  currentProject = index;
+  syncCarouselControls();
+  if (Math.abs(offset) > 2) projectGrid.scrollBy({left: offset, behavior: instant || reducedMotion.matches ? 'instant' : 'smooth'});
+  scheduleRotation();
+}
+function updateCarouselFocus() {
+  const active = document.activeElement;
+  carouselFocused = (projectGrid.contains(active) || carouselNavigation.contains(active)) && active.matches(':focus-visible');
+  scheduleRotation();
+}
+function onCarouselFocus(event) {
+  updateCarouselFocus();
+  const card = event.target.closest('.project-card');
+  if (card) goToProject(projectCards.indexOf(card), true);
+}
+projectGrid.addEventListener('focusin', onCarouselFocus);
+carouselNavigation.addEventListener('focusin', onCarouselFocus);
+projectGrid.addEventListener('focusout', () => queueMicrotask(updateCarouselFocus));
+carouselNavigation.addEventListener('focusout', () => queueMicrotask(updateCarouselFocus));
+projectGrid.addEventListener('pointerdown', () => { carouselInteracting = true; scheduleRotation(); });
+window.addEventListener('pointerup', () => { if (carouselInteracting) { carouselInteracting = false; scheduleRotation(); } });
+window.addEventListener('pointercancel', () => { if (carouselInteracting) { carouselInteracting = false; scheduleRotation(); } });
+projectGrid.addEventListener('toggle', scheduleRotation, true);
+projectGrid.addEventListener('keydown', event => {
+  if (event.target !== projectGrid || !['ArrowLeft', 'ArrowRight'].includes(event.key)) return;
+  event.preventDefault();
+  goToProject(currentProject + (event.key === 'ArrowRight' ? 1 : -1));
+});
+projectGrid.addEventListener('scroll', () => {
+  clearTimeout(scrollTimer);
+  scrollTimer = setTimeout(() => { updateCarousel(); scheduleRotation(); }, 100);
+}, {passive: true});
+carouselPrevious.addEventListener('click', () => goToProject(currentProject - 1));
+carouselNext.addEventListener('click', () => goToProject(currentProject + 1));
+carouselArea.addEventListener('pointerenter', event => { if (event.pointerType === 'mouse') { carouselHovered = true; scheduleRotation(); } });
+carouselArea.addEventListener('pointerleave', event => { if (event.pointerType === 'mouse') { carouselHovered = false; scheduleRotation(); } });
+if ('IntersectionObserver' in window) {
+  new IntersectionObserver(entries => { carouselVisible = entries[0].isIntersecting; scheduleRotation(); }, {threshold: .15}).observe(projectGrid);
+} else carouselVisible = true;
+document.addEventListener('visibilitychange', scheduleRotation);
+window.addEventListener('scenevisibilitychange', scheduleRotation);
+window.addEventListener('resize', () => { updateCarousel(); scheduleRotation(); });
+reducedMotion.addEventListener('change', event => { automatic = !event.matches; scheduleRotation(); });
+syncCarouselControls();
 const skills = [
-  ['GMS','Spieleentwicklung','Spiele'], ['BE','Serverentwicklung / Node.js','Server'], ['IoT','Vernetzte Geräte','Vernetzung'], ['FE','Frontend / JavaScript','Frontend'],
-  ['PR','Python und Grundlagen','Programmierung'], ['DB','Datenbanken / SQL und UML','Datenbanken'], ['TL','Werkzeuge / MS Office','Werkzeuge'], ['SY','Systeme / Git und sauberer Code','Systeme']
+  ['JAVA', 'Java und Anwendungen', 'Java'], ['JS', 'JavaScript und 3D', 'JavaScript'],
+  ['PHP', 'PHP und Spiellogik', 'PHP'], ['PY', 'Python und Flask', 'Python'],
+  ['3D', 'Three.js', 'Three.js'], ['CSV', 'Daten und CSV', 'CSV'],
+  ['DKR', 'Docker und Systeme', 'Docker'], ['WEB', 'Weboberflächen', 'HTML']
 ];
-const projects = [
-  ['Migros Prop Hunt','Spiele','Ein kreatives Versteckspiel im Migros-Universum.','projekt-migrosprophunt.html'],
-  ['Node.js API Development','Server','Serverseitige Entwicklung von REST-Schnittstellen.','projekt-nodejs.html'],
-  ['Internet of Everything','Vernetzung','Physische Geräte vernetzen und Daten visualisieren.','projekt-iot.html'],
-  ['JS Frontend','Frontend','Dynamische Webseiten mit reinem JavaScript.','projekt-frontend.html'],
-  ['Python Crashcourse','Programmierung','Schnelleinstieg in die Programmiersprache Python.','projekt-python.html'],
-  ['Datenbanken & UML','Datenbanken','Relationale Datenbanken entwerfen und modellieren.','projekt-database.html'],
-  ['Microsoft Office','Werkzeuge','Professionelle Präsentationen mit PowerPoint.','projekt-office.html'],
-  ['Programmiergrundlagen I','Programmierung','Erste Schritte: Variablen, Schleifen und Funktionen.','projekt-programming1.html'],
-  ['Development Fundamentals','Systeme','Git, sauberer Code und Entwicklungsprozesse.','projekt-dev-fundamentals.html'],
-  ['Windows Internals','Systeme','Einblicke in das Windows-Betriebssystem.','projekt-windows.html']
-];
-const elements = {name:document.querySelector('#name'),email:document.querySelector('#email'),message:document.querySelector('#message'),newsletter:document.querySelector('#newsletter-email')};
-let world;
-const skillControls=document.querySelector('#skill-controls');
-skills.forEach((skill,index)=>{
-  const button=document.createElement('button');
-  button.type='button';button.tabIndex=-1;
-  button.textContent=`${skill[0]} – ${skill[1]}: ${projects.filter(project=>project[1]===skill[2]).map(project=>project[0]).join(', ')}`;
-  button.addEventListener('focus',()=>world?.selectSkill(index));button.addEventListener('click',()=>world?.selectSkill(index));skillControls.append(button);
-});
-const selectSkill=index=>{document.querySelector('#skill-status').textContent=`${skills[index][1]}: ${projects.filter(project=>project[1]===skills[index][2]).map(project=>project[0]).join(', ')}`;};
-const selectPage=page=>{document.querySelector('#page-status').textContent=`Notizbuchseite ${page+1} von 4`;};
-world=initScene({skills,projects,onSkillSelect:selectSkill,onPageChange:selectPage,elements,onOpenTextView:()=>setTextView(true,document.querySelector('#start'),true),onOpenContact:openPhoneForm});
-const viewToggle=document.querySelector('#view-toggle');
-let closingView=false;
-function setTextView(enabled,stage,moveFocus=false){
-  if(!world.available||closingView)return;
-  if(enabled){
-    document.body.classList.add('text-view');
-    document.querySelector('#start .access-copy').getBoundingClientRect();
-    window.dispatchEvent(new Event('scenevisibilitychange'));
-    window.dispatchEvent(new Event('resize'));
-    (stage||document.querySelector('#start')).scrollIntoView({behavior:'instant',block:'start'});
-    if(moveFocus)document.querySelector('h1').focus({preventScroll:true});
-    return;
+const toggle = document.querySelector('#view-toggle');
+const navigation = document.querySelector('#scene-navigation');
+const stationButtons = [...navigation.querySelectorAll('[data-station]')];
+const sceneAccess = document.querySelector('#scene-access');
+let currentStation = 'start';
+const status = document.querySelector('#scene-status');
+const copies = [...document.querySelectorAll('.access-copy')];
+let world, loading = false;
+toggle.hidden = false;
+
+function stationChanged(index) {
+  currentStation = stationButtons[index]?.dataset.station || 'start';
+  stationButtons.forEach((button, i) => {
+    if (i === index) button.setAttribute('aria-current', 'step');
+    else button.removeAttribute('aria-current');
+  });
+  document.querySelector('#scene-pages').hidden = index !== 2;
+}
+function pageChanged(page) {
+  const count = projects.length;
+  document.querySelector('#scene-page-status').textContent = `Seite ${page + 1} von ${count}`;
+  const previous = document.querySelector('#scene-previous');
+  const next = document.querySelector('#scene-next');
+  previous.disabled = page === 0;
+  next.disabled = page >= count - 1;
+  if (document.body.classList.contains('immersive')) {
+    if (document.activeElement === next && next.disabled) previous.focus({preventScroll:true});
+    else if (document.activeElement === previous && previous.disabled) next.focus({preventScroll:true});
   }
-  const stages=Array.from(document.querySelectorAll('.story-stage')).filter(item=>item.getClientRects().length);
-  const current=stage||stages.reduce((closest,item)=>Math.abs(item.getBoundingClientRect().top)<Math.abs(closest.getBoundingClientRect().top)?item:closest);
-  closingView=true;
-  document.body.classList.add('leaving-text');
-  const delay=matchMedia('(prefers-reduced-motion: reduce)').matches?0:220;
-  setTimeout(()=>{
-    document.body.classList.remove('text-view','leaving-text');
-    window.dispatchEvent(new Event('scenevisibilitychange'));
-    window.dispatchEvent(new Event('resize'));
-    window.scrollTo({top:current.offsetTop,left:0,behavior:'instant'});
-    document.body.focus({preventScroll:true});
-    closingView=false;
-  },delay);
 }
-if(world.available){document.body.classList.add('immersive');viewToggle.hidden=false;window.dispatchEvent(new Event('resize'));}
-viewToggle.addEventListener('click',()=>setTextView(false));
-const phoneDialog=document.querySelector('#phone-form-dialog'),phoneFormContent=document.querySelector('#phone-form-content');
-let phoneForm,phoneFormPlaceholder;
-function openPhoneForm(isNewsletter){
-  if(phoneFormPlaceholder)return;
-  phoneForm=document.querySelector(isNewsletter?'#newsletter-form':'#contact-form');
-  phoneFormPlaceholder=document.createComment('phone form');phoneForm.before(phoneFormPlaceholder);
-  phoneFormContent.append(phoneForm);
-  document.querySelector('#phone-form-title').textContent=isNewsletter?'Neuigkeiten':'Nachricht schreiben';
-  world.setPhonePage(isNewsletter?'newsletter':'form');phoneDialog.showModal();
-}
-document.querySelector('#phone-form-close').addEventListener('click',()=>phoneDialog.close());
-phoneDialog.addEventListener('close',()=>{if(phoneFormPlaceholder){phoneFormPlaceholder.replaceWith(phoneForm);phoneFormPlaceholder=null;phoneForm=null;}world.setPhonePage('home');});
-document.querySelector('#previous-page').addEventListener('click',()=>world.turnPage(-1));document.querySelector('#next-page').addEventListener('click',()=>world.turnPage(1));
-for(const element of Object.values(elements))element.addEventListener('input',()=>{element.removeAttribute('aria-invalid');world.refreshPhone();});
-// Keyboard access to the scene's underlying content opens the readable view.
-document.addEventListener('focusin',event=>{
-  const stage=event.target.closest('.story-stage');
-  if(stage&&document.body.classList.contains('immersive')&&!document.body.classList.contains('text-view')){setTextView(true,stage);event.target.scrollIntoView({behavior:'instant',block:'nearest'});}
-});
-document.querySelector('.copy-email').addEventListener('click',async()=>{
-  const status=document.querySelector('#copy-status');
-  try { await navigator.clipboard.writeText('philippesaxer8@gmail.com');status.textContent='E-Mail-Adresse kopiert.'; }
-  catch { status.textContent='Kopieren nicht möglich. Die Adresse steht direkt darüber.'; }
-});
-const clean=value=>value.replace(/[\u0000-\u001f\u007f<>]/g,' ').replace(/\s+/g,' ').trim();
-const cleanMessage=value=>value.replace(/\r\n?/g,'\n').replace(/[\u0000-\u0009\u000b-\u001f\u007f<>]/g,' ').trim();
-const validEmail=value=>/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
-function prepareMail(form,isNewsletter){
-  const data=new FormData(form),email=clean(String(data.get('email')||'')),name=clean(String(data.get('name')||'')),message=cleanMessage(String(data.get('message')||''));
-  const status=document.querySelector(isNewsletter?'#newsletter-status':'#contact-status');
-  if(data.get('website'))return;
-  const invalid=!isNewsletter&&!name?form.elements.name:!validEmail(email)?form.elements.email:!isNewsletter&&!message?form.elements.message:null;
-  if(invalid){
-    status.textContent='Bitte fülle alle Felder aus und gib eine gültige E-Mail-Adresse ein.';
-    invalid.setAttribute('aria-invalid','true');world.setPhoneStatus(status.textContent);invalid.focus();return;
+function showReading(target = '#start', focus = false) {
+  document.body.classList.remove('immersive');
+  copies.forEach(copy => { copy.inert = false; });
+  navigation.hidden = true;
+  sceneAccess.hidden = true;
+  window.dispatchEvent(new Event('scenevisibilitychange'));
+  window.dispatchEvent(new Event('resize'));
+  const destination = document.querySelector(target) || document.querySelector('#start');
+  if (destination instanceof HTMLDetailsElement) destination.open = true;
+  destination.scrollIntoView({behavior: 'instant', block: 'start'});
+  if (focus) {
+    const focusTarget = destination instanceof HTMLDetailsElement ? destination.querySelector('summary') : (destination.querySelector('h1, h2') || destination);
+    if (!focusTarget.hasAttribute('tabindex') && !focusTarget.matches('summary')) focusTarget.tabIndex = -1;
+    focusTarget.focus({preventScroll: true});
   }
-  form.elements.csrf_token.value=document.querySelector('meta[name="csrf-token"]')?.content||'';
-  const subject=isNewsletter?'Anfrage zu Neuigkeiten':`Nachricht von ${name}`;
-  const body=isNewsletter?`Hallo Philippe,\n\nich interessiere mich für Neuigkeiten.\n\nMeine E-Mail: ${email}`:`Hallo Philippe,\n\n${message}\n\n${name}\n${email}`;
-  status.textContent='Dein E-Mail-Programm wird geöffnet. Bitte sende die Nachricht dort ab.';world.setPhoneStatus(status.textContent);
-  window.location.href=`mailto:philippesaxer8@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
 }
-document.querySelector('#contact-form').addEventListener('submit',e=>{e.preventDefault();prepareMail(e.currentTarget,false);});
-document.querySelector('#newsletter-form').addEventListener('submit',e=>{e.preventDefault();prepareMail(e.currentTarget,true);});
+async function showScene({ automatic = false } = {}) {
+  if (loading) return;
+  if (!world) {
+    loading = true;
+    toggle.disabled = true;
+    status.textContent = '3D-Ansicht wird geladen … Die Leseansicht bleibt verfügbar.';
+    let interrupted = false;
+    const cancelAutomatic = () => { if (automatic) interrupted = true; };
+    const interactionEvents = ['pointerdown', 'keydown', 'wheel', 'touchstart'];
+    interactionEvents.forEach(type => window.addEventListener(type, cancelAutomatic, { passive: true }));
+    try {
+      const { initScene } = await import('./scene.js');
+      if (interrupted) { status.textContent = ''; return; }
+      world = initScene({skills, projects, onSkillSelect: () => {}, onPageChange: pageChanged,
+        onStationChange: stationChanged, onProgress: value => navigation.style.setProperty('--scene-progress', value.toFixed(4)), onOpenTextView: () => showReading('#start', true),
+        onOpenProject: index => showReading(projects[index]?.[3] ? `#${projects[index][3]}` : '#projekte', true),
+        onContextLost: () => { showReading('#start', true); status.textContent = 'Die 3D-Ansicht ist nicht mehr verfügbar. Du kannst hier weiterlesen oder die Seite neu laden.'; toggle.disabled = true; }});
+      if (!world.available) throw new Error('WebGL unavailable');
+      status.textContent = '';
+    } catch (error) {
+      console.warn('3D-Ansicht konnte nicht geladen werden:', error);
+      status.textContent = 'Die 3D-Ansicht konnte nicht geladen werden. Du kannst das Portfolio hier lesen oder es erneut versuchen.';
+      world = null;
+      return;
+    } finally {
+      interactionEvents.forEach(type => window.removeEventListener(type, cancelAutomatic));
+      loading = false; toggle.disabled = false;
+    }
+  }
+  document.body.classList.add('immersive');
+  copies.forEach(copy => { copy.inert = true; });
+  navigation.hidden = false;
+  sceneAccess.hidden = false;
+  window.scrollTo({top: 0, behavior: 'instant'});
+  window.dispatchEvent(new Event('scenevisibilitychange'));
+  window.dispatchEvent(new Event('resize'));
+  stationChanged(0);
+  if (!automatic) stationButtons[0].focus({preventScroll:true});
+}
+toggle.addEventListener('click', () => showScene());
+stationButtons.forEach(button => button.addEventListener('click', () => {
+  const target = document.getElementById(button.dataset.station);
+  window.scrollTo({top: target.getBoundingClientRect().top + window.scrollY, behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth'});
+}));
+document.querySelector('#scene-read').addEventListener('click', () => showReading(currentStation.startsWith('notizen') ? '#ueber-mich' : `#${currentStation}`, true));
+document.querySelector('#scene-previous').addEventListener('click', () => world?.turnPage(-1));
+document.querySelector('#scene-next').addEventListener('click', () => world?.turnPage(1));
+document.querySelector('.skip-link').addEventListener('click', event => {
+  if (document.body.classList.contains('immersive')) { event.preventDefault(); showReading('#start', true); }
+});
+document.querySelector('.copy-email').addEventListener('click', async () => {
+  const feedback = document.querySelector('#copy-status');
+  try { await navigator.clipboard.writeText('philippesaxer8@gmail.com'); feedback.textContent = 'E-Mail-Adresse kopiert.'; }
+  catch { feedback.textContent = 'Kopieren nicht möglich. Die Adresse steht direkt darüber.'; }
+});
+
+// Deep links keep their reading-view destination; the normal entry opens in 3D.
+if (!location.hash) showScene({automatic: true});
